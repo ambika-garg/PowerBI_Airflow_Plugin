@@ -11,7 +11,7 @@ from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
 from airflow.models.variable import Variable
 from airflow.operators.bash import BashOperator
-from PowerBIRefreshDatasetOperator import PowerBIDatasetRefreshOperator
+from plugins.PowerBIRefreshDatasetOperator import PowerBIDatasetRefreshOperator
 
 
 with DAG(
