@@ -1,7 +1,7 @@
 import time
 from airflow.operators import BaseOperator
 
-from hooks.PowerBIHook import PowerBIHook
+from plugins.PowerBIHook import PowerBIHook
 
 class PowerBIDatasetRefreshOperator(BaseOperator):
     """
