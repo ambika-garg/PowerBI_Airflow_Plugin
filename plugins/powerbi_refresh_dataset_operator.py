@@ -28,9 +28,12 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
 
     def execute(self, context):
         # Get Hook class
-        if not self.hook:
-            self.hook = PowerBIHook(client_id = self.client_id)
+        # if not self.hook:
+        #     self.hook = PowerBIHook(client_id = self.client_id)
 
-        self.hook.dataset_refresh(dataset_id=self.dataset_id, group_id=self.group_id)
+        # self.hook.dataset_refresh(dataset_id=self.dataset_id, group_id=self.group_id)
 
         # call Dataset Refresh
+        print(self.client_id)
+        print(self.group_id)
+        print(self.dataset_id)
