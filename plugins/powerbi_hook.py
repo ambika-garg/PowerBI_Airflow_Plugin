@@ -1,4 +1,4 @@
-from airflow.hooks.base_hook import BaseHook
+from airflow.hooks.base import BaseHook
 from airflow.models import Variable
 from airflow.exceptions import AirflowException
 import requests
