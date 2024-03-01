@@ -45,6 +45,7 @@ class PowerBIHook(BaseHook):
 
         parameters = Variable.get("parameters", default_var=None)
         print(parameters)
+        return ""
 
 
     def _send_request(self,
