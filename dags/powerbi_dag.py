@@ -25,7 +25,7 @@ with DAG(
 
     list_files = BashOperator(
         task_id = "List_files",
-        bash_command = "ls pwd"
+        bash_command = "ls /opt/airflow/git/powerbi-dataset-refresh.git"
     )
 
     powerbi_dataset_refresh = PowerBIDatasetRefreshOperator(
