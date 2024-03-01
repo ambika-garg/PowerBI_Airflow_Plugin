@@ -24,7 +24,7 @@ with DAG(
 ) as dag:
 
     list_files = BashOperator(
-        task_id = "List files",
+        task_id = "List_files",
         bash_command = "ls"
     )
 
