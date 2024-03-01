@@ -10,7 +10,7 @@ class PowerBIHook(BaseHook):
     def __init__(
         self,
         client_id: str,
-        powerbi_conn_id: None | str
+        powerbi_conn_id: str
     ):
         self.client_id = client_id,
         self.powerbi_conn_id = powerbi_conn_id
