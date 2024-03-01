@@ -11,7 +11,7 @@ from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
 from airflow.models.variable import Variable
 from airflow.operators.bash import BashOperator
-# from PowerBIRefreshDatasetOperator import PowerBIDatasetRefreshOperator
+from operators.PowerBIRefreshDatasetOperator import PowerBIDatasetRefreshOperator
 
 
 with DAG(
@@ -28,12 +28,11 @@ with DAG(
         bash_command = "ls"
     )
 
-    # powerbi_dataset_refresh = PowerBIDatasetRefreshOperator(
-    #     task_id = "powerbi_dataset_refresh_task",
-    #     client_id=Variable.get("client_id", default_var=None),
-    #     group_id=Variable.get("group_id", default_var=None),
-    #     dataset_id=Variable.get("dataset_id", default_var=None)
-    # )
+    powerbi_dataset_refresh = PowerBIDatasetRefreshOperator(
+        task_id = "powerbi_dataset_refresh_task",
+        client_id=Variable.get("client_id", default_var=None),
+        group_id=Variable.get("group_id", default_var=None),
+        dataset_id=Variable.get("dataset_id", default_var=None)
+    )
 
-    list_files
-    # >> powerbi_dataset_refresh
+    list_files >> powerbi_dataset_refresh
