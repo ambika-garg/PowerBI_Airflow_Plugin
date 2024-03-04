@@ -20,8 +20,8 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
     ):
         super().__init__(*args, **kwargs)
         self.client_id = client_id
-        self.task_id = task_id
         self.dataset_id = dataset_id
+        self.task_id = task_id
         self.group_id = group_id
         self.hook = None
 
