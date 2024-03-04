@@ -29,10 +29,14 @@ with DAG(
     )
 
     powerbi_dataset_refresh = PowerBIDatasetRefreshOperator(
-        client_id=Variable.get("client_id", default_var=None),
-        dataset_id=Variable.get("dataset_id", default_var=None),
-        task_id = "powerbi_dataset_refresh_task",
-        group_id=Variable.get("group_id", default_var=None),
+        client_id="abc",
+        dataset_id="def",
+        task_id="power_bi_dataset_refresh",
+        group_id="gp_id"
+        # client_id=Variable.get("client_id", default_var=None),
+        # dataset_id=Variable.get("dataset_id", default_var=None),
+        # task_id = "powerbi_dataset_refresh_task",
+        # group_id=Variable.get("group_id", default_var=None),
     )
 
     list_files >> powerbi_dataset_refresh
