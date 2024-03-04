@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 from airflow.models.variable import Variable
 from airflow.operators.bash import BashOperator
 
-from powerbi_refresh_dataset_operator import PowerBIDatasetRefreshOperator
+from plugins.powerbi_refresh_dataset_operator import PowerBIDatasetRefreshOperator
 
 with DAG(
         dag_id='refresh_dataset_powerbi',
