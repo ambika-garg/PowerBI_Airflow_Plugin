@@ -51,7 +51,7 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
             'scope': scope
         }
 
-        r = requests.post(self.auth_url, data=data)
+        r = requests.post(url, data=data)
         r.raise_for_status()
 
         print(r.json().get('access_token'))
