@@ -62,12 +62,12 @@ class TryOpenAuthOperator(BaseOperator):
         webbrowser.open(authorization_url)
 
         # You can continue your workflow logic here, waiting for the auth_code asynchronously.
-        # For demonstration, let's just pause execution.
-        input("Press Enter to continue after authorization...")
+        # # For demonstration, let's just pause execution.
+        # input("Press Enter to continue after authorization...")
 
-        # You can now use the obtained auth_code for further authentication steps
+        # # You can now use the obtained auth_code for further authentication steps
 
-        # Stop the Flask server
+        # # Stop the Flask server
         func = request.environ.get('werkzeug.server.shutdown')
         if func:
             func()
