@@ -35,3 +35,4 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
         print(self.client_id)
         print(self.group_id)
         print(self.dataset_id)
+        return
