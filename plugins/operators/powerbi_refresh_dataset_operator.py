@@ -1,7 +1,6 @@
 import time
 from airflow.models import BaseOperator
-import json
-import urllib3
+import requests
 from airflow.models.variable import Variable
 from hooks.powerbi_hook import PowerBIHook
 from urllib.parse import urlencode
@@ -37,29 +36,23 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
         client_secret = Variable.get("client_secret", default_var=None)
         tenant_id = Variable.get("tenant_id", default_var=None)
         resource='https://analysis.windows.net/powerbi/api'
+        scope='https://api.powerbi.com'
+        username=Variable.get("username", default_var=None)
+        password = Variable.get("password", default_var=None)
 
-        url = f'https://login.microsoftonline.com/{tenant_id}/oauth2/token'
+        url = f'https://login.windows.net/common/oauth2/token'
         data = {
-            'grant_type': 'client_credentials',
+            'grant_type': 'password',
             'client_id': client_id,
             'client_secret': client_secret,
-            'resource': resource
+            'resource': resource,
+            'username': username,
+            'password': password,
+            'scope': scope
         }
-        encoded_data = urlencode(data).encode('utf-8')
 
-        http = urllib3.PoolManager()
-        response = http.request(
-            'POST',
-            url,
-            body=encoded_data,
-            headers={'Content-Type': 'application/x-www-form-urlencoded'}
-        )
-        response_data = json.loads(response.data)
+        r = requests.post(self.auth_url, data=data)
+        r.raise_for_status()
 
-        if response.status == 200 and 'access_token' in response_data:
-            self.access_token = response_data['access_token']
-        else:
-            raise Exception(f"Failed to obtain Power BI access token. Response: {response_data}")
-
-        print(self.access_token)
+        print(r.json().get('access_token'))
         return
