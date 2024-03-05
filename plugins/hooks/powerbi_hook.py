@@ -87,8 +87,7 @@ class PowerBIHook(BaseHook):
         :param url: The URL against which the request needs to be made.
         :return: requests.Response
         """
-        if not self.header:
-            self.header = {'Authorization': f'Bearer {self._get_token()}'}
+        self.header = {'Authorization': f'Bearer {self._get_token()}'}
 
         request_funcs = {
             'GET': requests.get,
