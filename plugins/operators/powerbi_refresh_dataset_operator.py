@@ -13,7 +13,6 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
         self,
         client_id: str,
         dataset_id: str,
-        task_id: str,
         group_id: str = None,
         *args,
         **kwargs
@@ -21,7 +20,6 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
         super().__init__(*args, **kwargs)
         self.client_id = client_id
         self.dataset_id = dataset_id
-        self.task_id = task_id
         self.group_id = group_id
         self.hook = None
 
