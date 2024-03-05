@@ -29,13 +29,9 @@ with DAG(
     )
 
     powerbi_dataset_refresh = PowerBIDatasetRefreshOperator(
-        dataset_id="def",
         task_id="power_bi_dataset_refresh",
-        group_id="gp_id"
-        # client_id=Variable.get("client_id", default_var=None),
-        # dataset_id=Variable.get("dataset_id", default_var=None),
-        # task_id = "powerbi_dataset_refresh_task",
-        # group_id=Variable.get("group_id", default_var=None),
+        dataset_id="9f91d322-1201-461d-b76b-78e0aef0670a",
+        group_id="00d1112d-45fd-4af6-aa0c-65b9602772ff"
     )
 
     list_files >> powerbi_dataset_refresh

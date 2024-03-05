@@ -9,11 +9,11 @@ class PowerBIHook(BaseHook):
 
     def __init__(
         self,
-        client_id: str,
-        powerbi_conn_id: str
+        dataset_id: str,
+        group_id: str = None
     ):
-        self.client_id = client_id,
-        self.powerbi_conn_id = powerbi_conn_id
+        self.client_id = dataset_id,
+        self.group_id = group_id
 
     def dataset_refresh(self, dataset_id: str, group_id: str = None) -> None:
         """
@@ -43,9 +43,29 @@ class PowerBIHook(BaseHook):
         Retrieve the access token used to authenticate against the API.
         """
 
-        parameters = Variable.get("parameters", default_var=None)
-        print(parameters)
-        return ""
+        client_id=Variable.get("client_id", default_var=None)
+        client_secret = Variable.get("client_secret", default_var=None)
+        resource='https://analysis.windows.net/powerbi/api'
+        scope='https://api.powerbi.com'
+        username=Variable.get("username", default_var=None)
+        password = Variable.get("password", default_var=None)
+
+        url = f'https://login.windows.net/common/oauth2/token'
+        data = {
+            'grant_type': 'password',
+            'client_id': client_id,
+            'client_secret': client_secret,
+            'resource': resource,
+            'username': username,
+            'password': password,
+            'scope': scope
+        }
+
+        r = requests.post(url, data=data)
+        r.raise_for_status()
+
+        access_token = r.json().get('access_token')
+        return access_token
 
 
     def _send_request(self,
@@ -70,20 +90,19 @@ class PowerBIHook(BaseHook):
         if not self.header:
             self.header = {'Authorization': f'Bearer {self._get_token()}'}
 
-        # request_funcs = {
-        #     'GET': requests.get,
-        #     'POST': requests.post
-        # }
+        request_funcs = {
+            'GET': requests.get,
+            'POST': requests.post
+        }
 
-        # func = request_funcs.get(request_type.upper())
+        func = request_funcs.get(request_type.upper())
 
-        # if not func:
-        #     raise AirflowException(
-        #         f'Request type of {request_type.upper()} not supported.'
-        #     )
+        if not func:
+            raise AirflowException(
+                f'Request type of {request_type.upper()} not supported.'
+            )
 
-        # r = func(url=url, headers=self.header, **kwargs)
-        # r.raise_for_status()
-        # return r
-        return ""
+        r = func(url=url, headers=self.header, **kwargs)
+        r.raise_for_status()
+        return r
 

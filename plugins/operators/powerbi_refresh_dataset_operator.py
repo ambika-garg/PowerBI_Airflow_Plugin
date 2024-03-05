@@ -26,33 +26,9 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
 
     def execute(self, context):
         # Get Hook class
-        # if not self.hook:
-        #     self.hook = PowerBIHook(client_id = self.client_id)
+        if not self.hook:
+            self.hook = PowerBIHook(dataset_id = self.dataset_id, group_id = self.group_id)
 
-        # self.hook.dataset_refresh(dataset_id=self.dataset_id, group_id=self.group_id)
+        self.hook.dataset_refresh(dataset_id=self.dataset_id, group_id=self.group_id)
 
-        # call Dataset Refresh
-        client_id=Variable.get("client_id", default_var=None)
-        client_secret = Variable.get("client_secret", default_var=None)
-        tenant_id = Variable.get("tenant_id", default_var=None)
-        resource='https://analysis.windows.net/powerbi/api'
-        scope='https://api.powerbi.com'
-        username=Variable.get("username", default_var=None)
-        password = Variable.get("password", default_var=None)
-
-        url = f'https://login.windows.net/common/oauth2/token'
-        data = {
-            'grant_type': 'password',
-            'client_id': client_id,
-            'client_secret': client_secret,
-            'resource': resource,
-            'username': username,
-            'password': password,
-            'scope': scope
-        }
-
-        r = requests.post(url, data=data)
-        r.raise_for_status()
-
-        print(r.json().get('access_token'))
         return
