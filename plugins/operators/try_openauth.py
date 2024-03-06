@@ -54,7 +54,7 @@ class TryOpenAuthOperator(BaseOperator):
             "response_mode=query&"
             "scope=Notebook.Execute.All Notebook.Read.All Notebook.ReadWrite.All Notebook.Reshare.All&"
             "state=12345&nonce=7362CAEA-9CA5-4B43-9BA3-34D7C303EBA7&"
-            "redirect_uri=http://localhost:8080/oauth/callback"
+            "redirect_uri=https://www.google.com"
         )
 
         # Open the authorization URL in a browser for the user to authenticate
