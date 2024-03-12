@@ -1,5 +1,6 @@
 from airflow.hooks.base import BaseHook
 from airflow.models import Variable
+from azure.identity import ClientSecretCredential
 from airflow.exceptions import AirflowException
 import requests
 
@@ -49,6 +50,14 @@ class PowerBIHook(BaseHook):
         scope='https://api.powerbi.com'
         username=Variable.get("username", default_var=None)
         password = Variable.get("password", default_var=None)
+
+        credential = ClientSecretCredential(
+            client_id=client_id,
+            client_secret=client_secret,
+            tenant_id="98c45f19-7cac-4002-8702-97d943a5ccb4"
+        )
+
+        print("Client_secret_credential", credential.get_token(scope="https://analysis.windows.net/powerbi/api"))
 
         url = f'https://login.windows.net/common/oauth2/token'
         data = {
