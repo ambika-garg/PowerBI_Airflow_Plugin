@@ -57,7 +57,7 @@ class PowerBIHook(BaseHook):
             tenant_id="98c45f19-7cac-4002-8702-97d943a5ccb4"
         )
 
-        print("Client_secret_credential", credential.get_token(scope="https://analysis.windows.net/powerbi/api"))
+        print("Client_secret_credential", credential.get_token(scope="{resource}/.default"))
 
         url = f'https://login.windows.net/common/oauth2/token'
         data = {
