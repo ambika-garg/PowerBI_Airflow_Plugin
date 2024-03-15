@@ -1,5 +1,5 @@
 import time
-from airflow.operators import BaseOperator
+from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
 from powerbi_plugin.hooks.powerbi_hook import PowerBIHook
 
