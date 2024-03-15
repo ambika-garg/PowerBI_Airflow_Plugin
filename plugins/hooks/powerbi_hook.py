@@ -60,7 +60,7 @@ class PowerBIHook(BaseHook):
 
         token = credential.get_token("https://analysis.windows.net/powerbi/api/.default")
 
-        print("Client_secret_credential", token)
+        print("Client_secret_credential", token.token)
 
         # url = f'https://login.windows.net/common/oauth2/token'
         # data = {
