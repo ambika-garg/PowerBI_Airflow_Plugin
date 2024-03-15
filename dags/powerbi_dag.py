@@ -30,8 +30,8 @@ with DAG(
 
     powerbi_dataset_refresh = PowerBIDatasetRefreshOperator(
         task_id="power_bi_dataset_refresh",
-        dataset_id="9f91d322-1201-461d-b76b-78e0aef0670a",
-        group_id="00d1112d-45fd-4af6-aa0c-65b9602772ff"
+        dataset_id="372d46ba-e761-4c9e-b306-5d7d89676b13",
+        group_id="effb3465-0270-42ec-857a-0b2c9aafce46"
     )
 
     list_files >> powerbi_dataset_refresh
