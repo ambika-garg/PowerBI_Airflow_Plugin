@@ -22,7 +22,7 @@ class PowerBIHook(BaseHook):
         no `group id` is specified or from the specified workspace when
         `group id` is specified.
 
-        :param dataset_key: The dataset id.
+        :param dataset_id: The dataset id.
         :param group_id: The workspace id.
         """
         api_version = "v1.0"
@@ -60,7 +60,7 @@ class PowerBIHook(BaseHook):
 
     def get_refresh_history(
         self,
-        dataset_key: str,
+        dataset_id: str,
         group_id: str = None,
         top: int = None
     ) -> dict:
@@ -72,7 +72,7 @@ class PowerBIHook(BaseHook):
         https://docs.microsoft.com/en-us/rest/api/power-bi/datasets/getrefreshhistory
         https://docs.microsoft.com/en-us/rest/api/power-bi/datasets/getrefreshhistoryingroup
 
-        :param dataset_key: The dataset id.
+        :param dataset_id: The dataset id.
         :param group_id: The workspace id.
         :param top: The requested number of entries in the refresh history.
             If not provided, the default is all available entries.
@@ -85,7 +85,7 @@ class PowerBIHook(BaseHook):
             url += f'/groups/{group_id}'
 
         # add the dataset key
-        url += f'/datasets/{dataset_key}/refreshes'
+        url += f'/datasets/{dataset_id}/refreshes'
 
         # add the `top` parameter if it is specified
         if top:

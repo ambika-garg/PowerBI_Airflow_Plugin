@@ -17,7 +17,7 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
 
     :param client_id: Power BI App ID used to identify the application
         registered to have access to the REST API.
-    :param dataset_key: The dataset id.
+    :param dataset_id: The dataset id.
     :param group_id: The workspace id.
     :param wait_for_completion: Wait until the refresh completes before exiting.
     :param recheck_delay: Number of seconds to wait before rechecking the
@@ -31,8 +31,8 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
 
     @apply_defaults
     def __init__(self,
-                 client_id: str,
-                 dataset_key: str,
+                #  client_id: str,
+                 dataset_id: str,
                  group_id: str = None,
                  wait_for_completion: bool = True,
                  recheck_delay: int = 60,
@@ -40,8 +40,8 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
                  *args,
                  **kwargs):
         super().__init__(*args, **kwargs)
-        self.client_id = client_id
-        self.dataset_key = dataset_key
+        # self.client_id = client_id
+        self.dataset_id = dataset_id
         self.group_id = group_id
         self.wait_for_completion = wait_for_completion
         self.recheck_delay = recheck_delay
@@ -59,7 +59,7 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
 
         :return: str value of 'Completed`, `NoHistory` or `Unknown`
         """
-        history = self.hook.get_refresh_history(dataset_key=self.dataset_key,
+        history = self.hook.get_refresh_history(dataset_id=self.dataset_id,
                                                 group_id=self.group_id,
                                                 top=1)
         value = history.get('value')
@@ -105,7 +105,7 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
 
         # Start dataset refresh
         self.log.info('Starting refresh.')
-        self.hook.refresh_dataset(dataset_key=self.dataset_key,
+        self.hook.refresh_dataset(dataset_id=self.dataset_id,
                                   group_id=self.group_id)
 
         if self.wait_for_completion:
