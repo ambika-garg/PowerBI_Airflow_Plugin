@@ -39,6 +39,7 @@ class PowerBIHook(BaseHook):
         self._send_request('POST', url=url)
 
 
+
     def _get_token(self) -> str:
         """
         Retrieve the access token used to authenticate against the API.
@@ -46,41 +47,45 @@ class PowerBIHook(BaseHook):
 
         client_id=Variable.get("client_id", default_var=None)
         client_secret = Variable.get("client_secret", default_var=None)
-        resource='https://analysis.windows.net/powerbi/api'
-        scope='https://api.powerbi.com'
-        username=Variable.get("username", default_var=None)
-        password = Variable.get("password", default_var=None)
+        # resource='https://analysis.windows.net/powerbi/api'
+        # scope='https://api.powerbi.com'
+        # username=Variable.get("username", default_var=None)
+        # password = Variable.get("password", default_var=None)
 
         credential = ClientSecretCredential(
             client_id=client_id,
             client_secret=client_secret,
             tenant_id="98c45f19-7cac-4002-8702-97d943a5ccb4"
         )
-# https://analysis.windows.net/powerbi/api/.default
-        print("Client_secret_credential", credential.get_token("https://analysis.windows.net/powerbi/api/.default"))
 
-        url = f'https://login.windows.net/common/oauth2/token'
-        data = {
-            'grant_type': 'password',
-            'client_id': client_id,
-            'client_secret': client_secret,
-            'resource': resource,
-            'username': username,
-            'password': password,
-            'scope': scope
-        }
+        token = credential.get_token("https://analysis.windows.net/powerbi/api/.default")
 
-        r = requests.post(url, data=data)
-        r.raise_for_status()
+        print("Client_secret_credential", token)
 
-        access_token = r.json().get('access_token')
-        return access_token
+        # url = f'https://login.windows.net/common/oauth2/token'
+        # data = {
+        #     'grant_type': 'password',
+        #     'client_id': client_id,
+        #     'client_secret': client_secret,
+        #     'resource': resource,
+        #     'username': username,
+        #     'password': password,
+        #     'scope': scope
+        # }
+
+        # r = requests.post(url, data=data)
+        # r.raise_for_status()
+
+        # access_token = r.json().get('access_token')
+        return ""
 
 
-    def _send_request(self,
-                      request_type: str,
-                      url: str,
-                      **kwargs) -> requests.Response:
+    def _send_request(
+        self,
+        request_type: str,
+        url: str,
+        **kwargs
+    ) -> requests.Response:
         """
         Send a request to the Power BI REST API.
 
