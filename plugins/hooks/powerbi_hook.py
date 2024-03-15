@@ -51,17 +51,12 @@ class PowerBIHook(BaseHook):
         credential = ClientSecretCredential(
             client_id=client_id,
             client_secret=client_secret,
-            tenant_id="98c45f19-7cac-4002-8702-97d943a5ccb5"
+            tenant_id="98c45f19-7cac-4002-8702-97d943a5ccb4"
         )
 
-        #  Working tenant Id: tenant_id="98c45f19-7cac-4002-8702-97d943a5ccb4"
+        access_token = credential.get_token("https://analysis.windows.net/powerbi/api/.default")
 
-        token = credential.get_token("https://analysis.windows.net/powerbi/api/.default")
-
-        print("access token", token)
-        print("Client_secret_credential", token.token)
-
-        return ""
+        return access_token.token
 
 
     def _send_request(
