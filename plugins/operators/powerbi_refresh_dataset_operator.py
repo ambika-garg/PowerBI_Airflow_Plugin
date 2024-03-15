@@ -3,7 +3,7 @@ from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
 from hooks.powerbi_hook import PowerBIHook
 from airflow.models.taskinstancekey import TaskInstanceKey
-from airflow.models.baseoperatorlink import BaseOperatorLink
+from airflow.models import BaseOperatorLink
 from airflow.plugins_manager import AirflowPlugin
 
 class GoogleLink(BaseOperatorLink):
