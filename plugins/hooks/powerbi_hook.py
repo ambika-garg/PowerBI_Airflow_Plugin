@@ -13,7 +13,7 @@ class PowerBIHook(BaseHook):
         dataset_id: str,
         group_id: str = None
     ):
-        self.client_id = dataset_id,
+        self.dataset_id = dataset_id,
         self.group_id = group_id
 
     def dataset_refresh(self, dataset_id: str, group_id: str = None) -> None:
@@ -39,7 +39,6 @@ class PowerBIHook(BaseHook):
         self._send_request('POST', url=url)
 
 
-
     def _get_token(self) -> str:
         """
         Retrieve the access token used to authenticate against the API.
@@ -57,6 +56,43 @@ class PowerBIHook(BaseHook):
         access_token = credential.get_token("https://analysis.windows.net/powerbi/api/.default")
 
         return access_token.token
+
+
+    def get_refresh_history(
+        self,
+        dataset_key: str,
+        group_id: str = None,
+        top: int = None
+    ) -> dict:
+        """
+        Returns the refresh history of the specified dataset from
+        "My Workspace" when no `group id` is specified or from the specified
+        workspace when `group id` is specified.
+
+        https://docs.microsoft.com/en-us/rest/api/power-bi/datasets/getrefreshhistory
+        https://docs.microsoft.com/en-us/rest/api/power-bi/datasets/getrefreshhistoryingroup
+
+        :param dataset_key: The dataset id.
+        :param group_id: The workspace id.
+        :param top: The requested number of entries in the refresh history.
+            If not provided, the default is all available entries.
+        :return: dict object.
+        """
+        url = 'https://api.powerbi.com/v1.0/myorg'
+
+        # add the group id if it is specified
+        if group_id:
+            url += f'/groups/{group_id}'
+
+        # add the dataset key
+        url += f'/datasets/{dataset_key}/refreshes'
+
+        # add the `top` parameter if it is specified
+        if top:
+            url += f'?$top={top}'
+
+        r = self._send_request('GET', url=url)
+        return r.json()
 
 
     def _send_request(
