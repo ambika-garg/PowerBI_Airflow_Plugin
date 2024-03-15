@@ -16,7 +16,7 @@ class PowerBIHook(BaseHook):
         self.dataset_id = dataset_id,
         self.group_id = group_id
 
-    def dataset_refresh(self, dataset_id: str, group_id: str = None) -> None:
+    def refresh_dataset(self, dataset_id: str, group_id: str = None) -> None:
         """
         Triggers a refresh for the specified dataset from "My Workspace" if
         no `group id` is specified or from the specified workspace when
