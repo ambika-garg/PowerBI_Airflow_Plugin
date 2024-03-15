@@ -46,11 +46,12 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
         self.wait_for_completion = wait_for_completion
         self.recheck_delay = recheck_delay
         self.powerbi_conn_id = powerbi_conn_id
+        self.hook = None
 
 
-    def hook(self) -> PowerBIHook:
-        """Create and return an PowerBIHook"""
-        return PowerBIHook(powerbi_conn_id=self.powerbi_conn_id)
+    # def hook(self) -> PowerBIHook:
+    #     """Create and return an PowerBIHook"""
+    #     return PowerBIHook(dataset_id=self.dataset_id, group_id=self.group_id)
 
     def get_refresh_status(self) -> str:
         """
@@ -87,6 +88,9 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
         """
         Refresh the Power BI Dataset
         """
+
+        if not self.hook:
+            self.hook = PowerBIHook(dataset_id=self.dataset_id, group_id=self.group_id)
 
         # Check to see if a refresh is already in progress
         # Power BI only allows one refresh to take place and will raise
