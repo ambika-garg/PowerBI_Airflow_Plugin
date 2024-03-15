@@ -2,6 +2,15 @@ import time
 from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
 from hooks.powerbi_hook import PowerBIHook
+from airflow.models.taskinstancekey import TaskInstanceKey
+from airflow.models.baseoperatorlink import BaseOperatorLink
+from airflow.plugins_manager import AirflowPlugin
+
+class GoogleLink(BaseOperatorLink):
+    name = "Google"
+
+    def get_link(self, operator: BaseOperator, *, ti_key: TaskInstanceKey):
+        return "https://www.google.com"
 
 
 class PowerBIDatasetRefreshOperator(BaseOperator):
@@ -31,7 +40,6 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
 
     @apply_defaults
     def __init__(self,
-                #  client_id: str,
                  dataset_id: str,
                  group_id: str = None,
                  wait_for_completion: bool = True,
@@ -40,7 +48,6 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
                  *args,
                  **kwargs):
         super().__init__(*args, **kwargs)
-        # self.client_id = client_id
         self.dataset_id = dataset_id
         self.group_id = group_id
         self.wait_for_completion = wait_for_completion
@@ -114,3 +121,11 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
 
         if self.wait_for_completion:
             self.wait_on_completion()
+
+
+# Defining the plugin class
+class AirflowExtraLinkPlugin(AirflowPlugin):
+    name = "extra_link_plugin"
+    operator_extra_links = [
+        GoogleLink(),
+    ]
