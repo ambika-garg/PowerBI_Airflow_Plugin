@@ -37,6 +37,7 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
     template_fields = []
     template_ext = []
     ui_color = '#e4f0e8'
+    operator_extra_links = (GoogleLink(),)
 
     @apply_defaults
     def __init__(self,
