@@ -9,6 +9,7 @@ class PowerBILink(BaseOperatorLink):
     name = "Power BI"
 
     def get_link(self, operator: BaseOperator, *, ti_key: TaskInstanceKey):
+        print(operator)
         return "https://app.powerbi.com/groups/effb3465-0270-42ec-857a-0b2c9aafce46/datasets/372d46ba-e761-4c9e-b306-5d7d89676b13/details?experience=power-bi"
 
 
