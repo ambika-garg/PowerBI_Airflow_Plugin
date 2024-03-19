@@ -15,7 +15,7 @@ class PowerBIHook(BaseHook):
     hook_name: str = "Power BI"
 
     @classmethod
-    def get_ui_field_behaviour(cls) -> dict[str, Any]:
+    def get_ui_field_behaviour() -> dict[str, Any]:
         """Return custom field behaviour."""
         return {
             "hidden_fields": ["schema", "port", "host", "extra"],
