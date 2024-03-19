@@ -9,9 +9,9 @@ class PowerBIHook(BaseHook):
 
     resource = "https://analysis.windows.net/powerbi/api"
 
-    conn_type: str = "power_bi"
-    conn_name_attr: str = "power_bi_conn_id"
-    default_conn_name: str = "power_bi_default"
+    conn_type: str = "powerbi"
+    conn_name_attr: str = "powerbi_conn_id"
+    default_conn_name: str = "powerbi_default"
     hook_name: str = "Power BI"
 
     @classmethod

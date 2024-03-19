@@ -98,7 +98,7 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
         """
 
         if not self.hook:
-            self.hook = PowerBIHook(dataset_id=self.dataset_id, group_id=self.group_id)
+            self.hook = PowerBIHook(dataset_id=self.dataset_id, group_id=self.group_id, powerbi_conn_id=self.powerbi_conn_id)
 
         # Check to see if a refresh is already in progress
         # Power BI only allows one refresh to take place and will raise
