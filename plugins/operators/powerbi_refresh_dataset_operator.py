@@ -4,7 +4,6 @@ from airflow.utils.decorators import apply_defaults
 from hooks.powerbi_hook import PowerBIHook
 from airflow.models.taskinstancekey import TaskInstanceKey
 from airflow.models import BaseOperatorLink
-from airflow.plugins_manager import AirflowPlugin
 
 class GoogleLink(BaseOperatorLink):
     name = "Google"
@@ -122,11 +121,3 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
 
         if self.wait_for_completion:
             self.wait_on_completion()
-
-
-# Defining the plugin class
-class AirflowExtraLinkPlugin(AirflowPlugin):
-    name = "extra_link_plugin"
-    operator_extra_links = [
-        GoogleLink(),
-    ]
