@@ -17,6 +17,8 @@ class PowerBILink(BaseOperatorLink):
         logger.info("This is a log message")
         logger.info("Base Operator", operator)
 
+        # Do we have cross tenant link?
+
         return "https://app.powerbi.com/groups/effb3465-0270-42ec-857a-0b2c9aafce46/datasets/372d46ba-e761-4c9e-b306-5d7d89676b13/details?experience=power-bi"
 
 
