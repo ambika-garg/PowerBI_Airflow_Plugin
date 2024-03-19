@@ -10,5 +10,5 @@ class AirflowExtraLinkPlugin(AirflowPlugin):
         PowerBILink(),
     ]
     hooks= [
-        PowerBIHook(),
+        PowerBIHook,
     ]
