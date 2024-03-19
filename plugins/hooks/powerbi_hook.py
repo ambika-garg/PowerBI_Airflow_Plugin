@@ -64,13 +64,15 @@ class PowerBIHook(BaseHook):
         """
 
         conn = self.get_connection(self.conn_id)
+        # conn.login,
+        # conn.password,
 
         client_id=Variable.get("client_id", default_var=None)
         client_secret = Variable.get("client_secret", default_var=None)
 
         credential = ClientSecretCredential(
-            client_id=conn.login,
-            client_secret=conn.password,
+            client_id=client_id,
+            client_secret=client_secret,
             tenant_id="98c45f19-7cac-4002-8702-97d943a5ccb4"
         )
 
