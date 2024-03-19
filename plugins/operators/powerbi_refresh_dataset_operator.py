@@ -5,7 +5,7 @@ from hooks.powerbi_hook import PowerBIHook
 from airflow.models.taskinstancekey import TaskInstanceKey
 from airflow.models import BaseOperatorLink
 
-class GoogleLink(BaseOperatorLink):
+class PowerBILink(BaseOperatorLink):
     name = "Power BI"
 
     def get_link(self, operator: BaseOperator, *, ti_key: TaskInstanceKey):
@@ -36,7 +36,7 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
     template_fields = []
     template_ext = []
     ui_color = '#e4f0e8'
-    operator_extra_links = (GoogleLink(),)
+    operator_extra_links = (PowerBILink(),)
 
     @apply_defaults
     def __init__(self,
@@ -121,3 +121,6 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
 
         if self.wait_for_completion:
             self.wait_on_completion()
+
+        # Xcom Integration
+        context["ti"].xcom_push(key="powerbi_dataset_refresh_status", value=self.get_refresh_status())
