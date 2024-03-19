@@ -1,7 +1,7 @@
 from airflow.plugins_manager import AirflowPlugin
 
 from operators.powerbi_refresh_dataset_operator import PowerBILink
-from plugins.hooks.powerbi_hook import PowerBIHook
+from hooks.powerbi_hook import PowerBIHook
 
 # Defining the plugin class
 class AirflowExtraLinkPlugin(AirflowPlugin):
