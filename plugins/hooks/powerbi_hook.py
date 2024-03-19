@@ -63,7 +63,7 @@ class PowerBIHook(BaseHook):
         Retrieve the access token used to authenticate against the API.
         """
 
-        conn = self.get_connection(self.conn_id)
+        # conn = self.get_connection(self.conn_id)
         # conn.login,
         # conn.password,
 
