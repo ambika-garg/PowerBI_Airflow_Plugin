@@ -14,16 +14,16 @@ class PowerBIHook(BaseHook):
     default_conn_name: str = "powerbi_default"
     hook_name: str = "Power BI"
 
-    # @classmethod
-    # def get_ui_field_behaviour() -> dict[str, Any]:
-    #     """Return custom field behaviour."""
-    #     return {
-    #         "hidden_fields": ["schema", "port", "host", "extra"],
-    #         "relabeling": {
-    #             "login": "Client ID",
-    #             "password": "Secret",
-    #         },
-    #     }
+    @classmethod
+    def get_ui_field_behaviour() -> dict[str, Any]:
+        """Return custom field behaviour."""
+        return {
+            "hidden_fields": ["schema", "port", "host", "extra"],
+            "relabeling": {
+                "login": "Client ID",
+                "password": "Secret",
+            },
+        }
 
     def __init__(
         self,
