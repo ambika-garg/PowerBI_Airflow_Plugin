@@ -2,7 +2,7 @@ from airflow.hooks.base import BaseHook
 from airflow.models import Variable
 from azure.identity import ClientSecretCredential
 from airflow.exceptions import AirflowException
-from typing import Any
+from typing import Any, Dict
 import requests
 
 class PowerBIHook(BaseHook):
@@ -15,7 +15,7 @@ class PowerBIHook(BaseHook):
     hook_name: str = "Power BI"
 
     @classmethod
-    def get_ui_field_behaviour() -> dict[str, Any]:
+    def get_ui_field_behaviour() -> Dict[str, Any]:
         """Return custom field behaviour."""
         return {
             "hidden_fields": ["schema", "port", "host", "extra"],
