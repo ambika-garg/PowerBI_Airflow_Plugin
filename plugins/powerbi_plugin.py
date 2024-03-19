@@ -1,6 +1,6 @@
 from airflow.plugins_manager import AirflowPlugin
 
-from plugins.operators.powerbi_refresh_dataset_operator import GoogleLink
+from operators.powerbi_refresh_dataset_operator import GoogleLink
 
 # Defining the plugin class
 class AirflowExtraLinkPlugin(AirflowPlugin):
