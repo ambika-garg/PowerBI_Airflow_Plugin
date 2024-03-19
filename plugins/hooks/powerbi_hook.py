@@ -2,19 +2,38 @@ from airflow.hooks.base import BaseHook
 from airflow.models import Variable
 from azure.identity import ClientSecretCredential
 from airflow.exceptions import AirflowException
+from typing import Any
 import requests
 
 class PowerBIHook(BaseHook):
 
     resource = "https://analysis.windows.net/powerbi/api"
 
+    conn_type: str = "power_bi"
+    conn_name_attr: str = "power_bi_conn_id"
+    default_conn_name: str = "power_bi_default"
+    hook_name: str = "Power BI"
+
+    @classmethod
+    def get_ui_field_behaviour(cls) -> dict[str, Any]:
+        """Return custom field behaviour."""
+        return {
+            "hidden_fields": ["schema", "port", "host", "extra"],
+            "relabeling": {
+                "login": "Client ID",
+                "password": "Secret",
+            },
+        }
+
     def __init__(
         self,
         dataset_id: str,
-        group_id: str = None
+        group_id: str = None,
+        powerbi_conn_id: str = default_conn_name
     ):
         self.dataset_id = dataset_id,
         self.group_id = group_id
+        self.conn_id = powerbi_conn_id
 
     def refresh_dataset(self, dataset_id: str, group_id: str = None) -> None:
         """
@@ -44,12 +63,14 @@ class PowerBIHook(BaseHook):
         Retrieve the access token used to authenticate against the API.
         """
 
+        conn = self.get_connection(self.conn_id)
+
         client_id=Variable.get("client_id", default_var=None)
         client_secret = Variable.get("client_secret", default_var=None)
 
         credential = ClientSecretCredential(
-            client_id=client_id,
-            client_secret=client_secret,
+            client_id=conn.login,
+            client_secret=conn.password,
             tenant_id="98c45f19-7cac-4002-8702-97d943a5ccb4"
         )
 
