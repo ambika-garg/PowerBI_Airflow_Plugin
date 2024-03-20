@@ -7,8 +7,6 @@ import requests
 
 class PowerBIHook(BaseHook):
 
-    resource = "https://analysis.windows.net/powerbi/api"
-
     conn_type: str = "powerbi"
     conn_name_attr: str = "powerbi_conn_id"
     default_conn_name: str = "powerbi_default"
@@ -46,16 +44,16 @@ class PowerBIHook(BaseHook):
         """
         api_version = "v1.0"
 
-        url = f'https://api.powerbi.com/{api_version}/myorg'
+        url = f"https://api.powerbi.com/{api_version}/myorg"
 
         # add the group id if it is specified
         if group_id:
-            url += f'/groups/{group_id}'
+            url += f"/groups/{group_id}"
 
         # add the dataset key
-        url += f'/datasets/{dataset_id}/refreshes'
+        url += f"/datasets/{dataset_id}/refreshes"
 
-        self._send_request('POST', url=url)
+        self._send_request("POST", url=url)
 
 
     def _get_token(self) -> str:
@@ -64,9 +62,8 @@ class PowerBIHook(BaseHook):
         """
 
         # conn = self.get_connection(self.conn_id)
-        # conn.login,
-        # conn.password,
 
+        resource = "https://analysis.windows.net/powerbi/api"
         client_id=Variable.get("client_id", default_var=None)
         client_secret = Variable.get("client_secret", default_var=None)
         tenant_id = Variable.get("tenant_id", default_var=None)
@@ -77,7 +74,7 @@ class PowerBIHook(BaseHook):
             tenant_id=tenant_id
         )
 
-        access_token = credential.get_token("https://analysis.windows.net/powerbi/api/.default")
+        access_token = credential.get_token(f"{resource}/.default")
 
         return access_token.token
 
@@ -102,20 +99,20 @@ class PowerBIHook(BaseHook):
             If not provided, the default is all available entries.
         :return: dict object.
         """
-        url = 'https://api.powerbi.com/v1.0/myorg'
+        url = "https://api.powerbi.com/v1.0/myorg"
 
         # add the group id if it is specified
         if group_id:
-            url += f'/groups/{group_id}'
+            url += f"/groups/{group_id}"
 
         # add the dataset key
-        url += f'/datasets/{dataset_id}/refreshes'
+        url += f"/datasets/{dataset_id}/refreshes"
 
         # add the `top` parameter if it is specified
         if top:
-            url += f'?$top={top}'
+            url += f"?$top={top}"
 
-        r = self._send_request('GET', url=url)
+        r = self._send_request("GET", url=url)
         return r.json()
 
 
@@ -140,21 +137,20 @@ class PowerBIHook(BaseHook):
         :param url: The URL against which the request needs to be made.
         :return: requests.Response
         """
-        self.header = {'Authorization': f'Bearer {self._get_token()}'}
+        self.header = {"Authorization": f"Bearer {self._get_token()}"}
 
         request_funcs = {
-            'GET': requests.get,
-            'POST': requests.post
+            "GET": requests.get,
+            "POST": requests.post
         }
 
         func = request_funcs.get(request_type.upper())
 
         if not func:
             raise AirflowException(
-                f'Request type of {request_type.upper()} not supported.'
+                f"Request type of {request_type.upper()} not supported."
             )
 
         r = func(url=url, headers=self.header, **kwargs)
         r.raise_for_status()
         return r
-

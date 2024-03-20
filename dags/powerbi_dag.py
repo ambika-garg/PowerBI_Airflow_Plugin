@@ -3,16 +3,12 @@
 from airflow import DAG
 
 # Operators
-from airflow.operators.empty import EmptyOperator
-from airflow.operators.python import PythonOperator
-
+from airflow.operators.bash import BashOperator
+from operators.powerbi_refresh_dataset_operator import PowerBIDatasetRefreshOperator
 
 # Format date
-from datetime import datetime, timedelta
-from airflow.models.variable import Variable
-from airflow.operators.bash import BashOperator
+from datetime import datetime
 
-from operators.powerbi_refresh_dataset_operator import PowerBIDatasetRefreshOperator
 
 with DAG(
         dag_id='refresh_dataset_powerbi',
