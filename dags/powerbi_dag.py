@@ -23,15 +23,22 @@ with DAG(
         tags=['powerbi', 'dataset', 'refresh']
 ) as dag:
 
-    list_files = BashOperator(
-        task_id = "List_files",
-        bash_command = "ls /opt/airflow/git/powerbi-dataset-refresh.git"
+    start_dataset_refresh = BashOperator(
+        task_id="Start_PowerBI_Dataset_Refresh",
+        bash_command="echo Starting Refresh"
     )
 
-    powerbi_dataset_refresh = PowerBIDatasetRefreshOperator(
-        task_id="power_bi_dataset_refresh",
+    refresh_in_given_workspace = PowerBIDatasetRefreshOperator(
+        task_id="refresh_in_given_workspace",
         dataset_id="372d46ba-e761-4c9e-b306-5d7d89676b13",
         group_id="effb3465-0270-42ec-857a-0b2c9aafce46"
     )
 
-    list_files >> powerbi_dataset_refresh
+    # refresh_in_my_workspace = PowerBIDatasetRefreshOperator(
+    #     task_id="refresh_in_my_workspace",
+    #     dataset_id="372d46ba-e761-4c9e-b306-5d7d89676b13",
+    #     group_id="effb3465-0270-42ec-857a-0b2c9aafce46"
+    # )
+
+    start_dataset_refresh >> refresh_in_given_workspace
+    # >> refresh_in_my_workspace

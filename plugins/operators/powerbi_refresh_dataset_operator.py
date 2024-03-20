@@ -3,7 +3,7 @@ from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
 from hooks.powerbi_hook import PowerBIHook
 from airflow.models.taskinstancekey import TaskInstanceKey
-from airflow.models import BaseOperatorLink
+from airflow.models import BaseOperatorLink, XCom
 import logging
 
 import logging
@@ -14,12 +14,12 @@ class PowerBILink(BaseOperatorLink):
     name = "Power BI"
 
     def get_link(self, operator: BaseOperator, *, ti_key: TaskInstanceKey):
-        logger.info("This is a log message")
-        logger.info("Base Operator", operator)
+        group_id = XCom.get_value(key="group_id", ti_key=ti_key) or ""
+        dataset_id = XCom.get_value(key="dataset_id", ti_key=ti_key)
 
         # Do we have cross tenant link?
 
-        return "https://app.powerbi.com/groups/effb3465-0270-42ec-857a-0b2c9aafce46/datasets/372d46ba-e761-4c9e-b306-5d7d89676b13/details?experience=power-bi"
+        return f"https://app.powerbi.com/groups/{group_id}/datasets/{dataset_id}/details?experience=power-bi"
 
 
 class PowerBIDatasetRefreshOperator(BaseOperator):
@@ -134,3 +134,5 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
 
         # Xcom Integration
         context["ti"].xcom_push(key="powerbi_dataset_refresh_status", value=self.get_refresh_status())
+        context["ti"].xcom_push(key="dataset_id", value=self.dataset_id)
+        context["ti"].xcom_push(key="group_id", value=self.group_id)

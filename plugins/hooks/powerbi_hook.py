@@ -32,7 +32,7 @@ class PowerBIHook(BaseHook):
         powerbi_conn_id: str = default_conn_name
     ):
         self.dataset_id = dataset_id,
-        self.group_id = group_id
+        self.group_id = group_id,
         self.conn_id = powerbi_conn_id
 
     def refresh_dataset(self, dataset_id: str, group_id: str = None) -> None:
@@ -69,11 +69,12 @@ class PowerBIHook(BaseHook):
 
         client_id=Variable.get("client_id", default_var=None)
         client_secret = Variable.get("client_secret", default_var=None)
+        tenant_id = Variable.get("tenant_id", default_var=None)
 
         credential = ClientSecretCredential(
             client_id=client_id,
             client_secret=client_secret,
-            tenant_id="98c45f19-7cac-4002-8702-97d943a5ccb4"
+            tenant_id=tenant_id
         )
 
         access_token = credential.get_token("https://analysis.windows.net/powerbi/api/.default")
