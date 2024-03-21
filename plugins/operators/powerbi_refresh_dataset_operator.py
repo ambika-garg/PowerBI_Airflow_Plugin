@@ -13,14 +13,11 @@ class PowerBILink(BaseOperatorLink):
     name = "Power BI"
 
     def get_link(self, operator: BaseOperator, *, ti_key: TaskInstanceKey):
-        # group_id = XCom.get_value(key="group_id", ti_key=ti_key) or ""
-        # dataset_id = XCom.get_value(key="dataset_id", ti_key=ti_key)
+        group_id = XCom.get_value(key="group_id", ti_key=ti_key) or ""
+        dataset_id = XCom.get_value(key="dataset_id", ti_key=ti_key)
 
-        group_id = operator.group_id
-        dataset_id = operator.dataset_id
-
-        logger.info("Group Id: ", group_id)
-        logger.info("Dataset Id: ", dataset_id)
+        # group_id = operator.group_id
+        # dataset_id = operator.dataset_id
 
         return f"https://app.powerbi.com/groups/{group_id}/datasets/{dataset_id}/details?experience=power-bi"
 
@@ -81,6 +78,8 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
         history = self.hook.get_refresh_history(dataset_id=self.dataset_id,
                                                 group_id=self.group_id,
                                                 top=1)
+
+        print("Refresh history", history)
         value = history.get("value")
 
         if not value:
@@ -136,7 +135,6 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
             self.wait_on_completion()
 
         # Xcom Integration
-        context["ti"].xcom_push(
-            key="powerbi_dataset_refresh_status", value=self.get_refresh_status())
+        context["ti"].xcom_push(key="powerbi_dataset_refresh_status", value=self.get_refresh_status())
         context["ti"].xcom_push(key="dataset_id", value=self.dataset_id)
         context["ti"].xcom_push(key="group_id", value=self.group_id)
