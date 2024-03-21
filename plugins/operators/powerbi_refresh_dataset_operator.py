@@ -40,6 +40,7 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
     :param wait_for_completion: Wait until the refresh completes before exiting.
     :param recheck_delay: Number of seconds to wait before rechecking the
         refresh status.
+    :param force_refresh: Force refresh if pre-existing refresh found.
     :param powerbi_conn_id: Airflow Connection ID that contains the connection
         information for the Power BI account used for authentication.
     """
@@ -53,6 +54,7 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
                  group_id: str = None,
                  wait_for_completion: bool = True,
                  recheck_delay: int = 60,
+                 force_refresh: bool = True,
                  powerbi_conn_id: str = "powerbi_default",
                  *args,
                  **kwargs):
@@ -62,30 +64,33 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
         self.wait_for_completion = wait_for_completion
         self.recheck_delay = recheck_delay
         self.powerbi_conn_id = powerbi_conn_id
+        self.force_refresh = force_refresh
         self.hook = None
 
     # def hook(self) -> PowerBIHook:
     #     """Create and return an PowerBIHook"""
     #     return PowerBIHook(dataset_id=self.dataset_id, group_id=self.group_id)
 
-    def get_refresh_status(self) -> str:
+    def get_refresh_details(self) -> dict:
         """
-        Get the refresh status of the most recent dataset refresh in the
+        Get the refresh details of the most recent dataset refresh in the
         refresh history of the data source.
 
-        :return: str value of "Completed`, `NoHistory` or `Unknown`
+        :return: dict object of refresh status and end time.
         """
         history = self.hook.get_refresh_history(dataset_id=self.dataset_id,
                                                 group_id=self.group_id,
                                                 top=1)
 
-        print("Refresh history", history)
         value = history.get("value")
 
         if not value:
             return "NoHistory"
         else:
-            return value[0].get("status")
+            return {
+                "status": value[0].get("status"),
+                "endTime": value[0].get("endTime")
+            }
 
     def wait_on_completion(self) -> None:
         """
@@ -93,11 +98,21 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
         """
         while True:
             time.sleep(self.recheck_delay)
-            status = self.get_refresh_status()
+            refresh_details = self.get_refresh_details()
+            status = refresh_details.get("status")
             self.log.info(f"Checking refresh status. Status is `{status}`")
             if status == "Completed":
                 self.log.info("Refresh completed.")
                 break
+
+    def trigger_refresh_dataset(self):
+        # Start dataset refresh
+        self.log.info("Starting refresh.")
+        self.hook.refresh_dataset(dataset_id=self.dataset_id,
+                                group_id=self.group_id)
+
+        if self.wait_for_completion:
+            self.wait_on_completion()
 
     def execute(self, context):
         """
@@ -117,24 +132,30 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
         # progress. We wait until any existing refreshes are completed
         # before starting a new one.
         self.log.info("Check if a refresh is already in progress.")
-        status = self.get_refresh_status()
+        refresh_details = self.get_refresh_details()
+        status = refresh_details.get("status")
 
         if status == "Unknown":
             self.log.info(
-                "Waiting for pre-existing refresh to complete before starting."
+                "Found pre-existing refresh."
             )
-            self.wait_on_completion()
+
+            if self.wait_for_completion:
+                self.wait_on_completion()
+
             self.log.info("Pre-existing refresh completed.")
 
-        # Start dataset refresh
-        self.log.info("Starting refresh.")
-        self.hook.refresh_dataset(dataset_id=self.dataset_id,
-                                  group_id=self.group_id)
+            if self.force_refresh:
+                self.trigger_refresh_dataset()
+        else:
+            self.trigger_refresh_dataset()
 
-        if self.wait_for_completion:
-            self.wait_on_completion()
+        refresh_details = self.get_refresh_details()
+        status = refresh_details.get("status")
+        endTime = refresh_details.get("endTime")
 
         # Xcom Integration
-        context["ti"].xcom_push(key="powerbi_dataset_refresh_status", value=self.get_refresh_status())
+        context["ti"].xcom_push(key="powerbi_dataset_refresh_status", value=status)
+        context["ti"].xcom_push(key="powerbi_dataset_refresh_endTime", value=endTime)
         context["ti"].xcom_push(key="dataset_id", value=self.dataset_id)
         context["ti"].xcom_push(key="group_id", value=self.group_id)
