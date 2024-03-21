@@ -96,13 +96,13 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
         """
         Wait until the dataset refresh has completed.
         """
+        self.log.info("Waiting for Completion")
         while True:
             time.sleep(self.recheck_delay)
             refresh_details = self.get_refresh_details()
             status = refresh_details.get("status")
             self.log.info(f"Checking refresh status. Status is `{status}`")
             if status == "Completed":
-                self.log.info("Refresh completed.")
                 break
 
     def trigger_refresh_dataset(self):
@@ -118,7 +118,6 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
         """
         Refresh the Power BI Dataset
         """
-
         if not self.hook:
             self.hook = PowerBIHook(
                 dataset_id=self.dataset_id,
