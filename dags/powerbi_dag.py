@@ -28,7 +28,7 @@ with DAG(
         task_id="refresh_in_given_workspace",
         dataset_id="372d46ba-e761-4c9e-b306-5d7d89676b13",
         group_id="effb3465-0270-42ec-857a-0b2c9aafce46",
-        force_refresh = True
+        force_refresh = False
     )
 
     # refresh_in_my_workspace = PowerBIDatasetRefreshOperator(
