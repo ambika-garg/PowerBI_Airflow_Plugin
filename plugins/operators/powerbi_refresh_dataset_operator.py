@@ -19,6 +19,9 @@ class PowerBILink(BaseOperatorLink):
         group_id = operator.group_id
         dataset_id = operator.dataset_id
 
+        print("Group Id: ", group_id)
+        print("Dataset Id: ", dataset_id)
+
         return f"https://app.powerbi.com/groups/{group_id}/datasets/{dataset_id}/details?experience=power-bi"
 
 
