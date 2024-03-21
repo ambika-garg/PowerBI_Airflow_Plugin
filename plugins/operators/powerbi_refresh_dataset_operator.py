@@ -148,6 +148,8 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
             if self.force_refresh:
                 self.trigger_refresh_dataset()
         else:
+            self.log.info("No Found pre-existing refresh.")
+
             self.trigger_refresh_dataset()
 
         refresh_details = self.get_refresh_details()
