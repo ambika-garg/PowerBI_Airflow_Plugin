@@ -1,11 +1,19 @@
-from airflow.hooks.base import BaseHook
-from airflow.models import Variable
-from azure.identity import ClientSecretCredential
-from airflow.exceptions import AirflowException
+"""Standard Library imports"""
 from typing import Any, Dict
 import requests
 
+from airflow.exceptions import AirflowException
+from airflow.hooks.base import BaseHook
+from airflow.models import Variable
+from azure.identity import ClientSecretCredential
+
+
 class PowerBIHook(BaseHook):
+    """
+    A hook to interact with Power BI.
+
+    :TODO: Add parameters
+    """
 
     conn_type: str = "powerbi"
     conn_name_attr: str = "powerbi_conn_id"
@@ -13,7 +21,7 @@ class PowerBIHook(BaseHook):
     hook_name: str = "Power BI"
 
     @classmethod
-    def get_ui_field_behaviour() -> Dict[str, Any]:
+    def get_ui_field_behaviour(cls) -> Dict[str, Any]:
         """Return custom field behaviour."""
         return {
             "hidden_fields": ["schema", "port", "host", "extra"],
@@ -29,9 +37,11 @@ class PowerBIHook(BaseHook):
         group_id: str = None,
         powerbi_conn_id: str = default_conn_name
     ):
-        self.dataset_id = dataset_id,
-        self.group_id = group_id,
+        self.dataset_id = dataset_id
+        self.group_id = group_id
         self.conn_id = powerbi_conn_id
+        self.header = None
+        super().__init__()
 
     def refresh_dataset(self, dataset_id: str, group_id: str = None) -> None:
         """
@@ -55,6 +65,7 @@ class PowerBIHook(BaseHook):
 
         self._send_request("POST", url=url)
 
+    # Override get_conn method
 
     def _get_token(self) -> str:
         """

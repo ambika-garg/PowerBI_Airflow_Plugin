@@ -1,13 +1,12 @@
+"""Standard imports"""
+from datetime import datetime
 
 # The DAG object
 from airflow import DAG
+from airflow.operators.bash import BashOperator
 
 # Operators
-from airflow.operators.bash import BashOperator
 from operators.powerbi_refresh_dataset_operator import PowerBIDatasetRefreshOperator
-
-# Format date
-from datetime import datetime
 
 
 with DAG(
@@ -38,5 +37,5 @@ with DAG(
     #     group_id="effb3465-0270-42ec-857a-0b2c9aafce46"
     # )
 
-    start_dataset_refresh >> refresh_in_given_workspace
+    start_dataset_refresh >> refresh_in_given_workspace #ignore
     # >> refresh_in_my_workspace

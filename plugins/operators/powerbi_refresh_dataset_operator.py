@@ -1,15 +1,22 @@
+"""Standard imports"""
 import time
+import logging
+
 from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
-from hooks.powerbi_hook import PowerBIHook
 from airflow.models.taskinstancekey import TaskInstanceKey
 from airflow.models import BaseOperatorLink, XCom
-import logging
+
+from hooks.powerbi_hook import PowerBIHook
 
 logger = logging.getLogger(__name__)
 
 
 class PowerBILink(BaseOperatorLink):
+    """
+    Construct a link to monitor a dataset in Power BI.
+    """
+
     name = "Power BI"
 
     def get_link(self, operator: BaseOperator, *, ti_key: TaskInstanceKey):
@@ -89,7 +96,7 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
         else:
             return {
                 "status": value[0].get("status"),
-                "endTime": value[0].get("endTime")
+                "end_time": value[0].get("end_time")
             }
 
     def wait_on_completion(self) -> None:
@@ -106,10 +113,13 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
                 break
 
     def trigger_refresh_dataset(self):
+        """
+        Triggers the Power BI dataset refresh.
+        """
         # Start dataset refresh
         self.log.info("Starting refresh.")
         self.hook.refresh_dataset(dataset_id=self.dataset_id,
-                                group_id=self.group_id)
+                                  group_id=self.group_id)
 
         if self.wait_for_completion:
             self.wait_on_completion()
@@ -153,10 +163,12 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
 
         refresh_details = self.get_refresh_details()
         status = refresh_details.get("status")
-        endTime = refresh_details.get("endTime")
+        end_time = refresh_details.get("end_time")
 
         # Xcom Integration
-        context["ti"].xcom_push(key="powerbi_dataset_refresh_status", value=status)
-        context["ti"].xcom_push(key="powerbi_dataset_refresh_endTime", value=endTime)
+        context["ti"].xcom_push(
+            key="powerbi_dataset_refresh_status", value=status)
+        context["ti"].xcom_push(
+            key="powerbi_dataset_refresh_end_time", value=end_time)
         context["ti"].xcom_push(key="dataset_id", value=self.dataset_id)
         context["ti"].xcom_push(key="group_id", value=self.group_id)
