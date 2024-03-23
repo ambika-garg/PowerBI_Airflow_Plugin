@@ -43,14 +43,14 @@ class PowerBIHook(BaseHook):
         self.header = None
         super().__init__()
 
-    def get_conn(self) -> Any:
-        """
-        Function that initiates a new connection to your external tool.
-        """
-        conn = self.get_connection(self.conn_id)
-        self.log.info(conn)
+    # def get_conn(self) -> Any:
+    #     """
+    #     Function that initiates a new connection to your external tool.
+    #     """
+    #     conn = self.get_connection(self.conn_id)
+    #     self.log.info(conn)
 
-        return conn
+    #     return conn
 
     def refresh_dataset(self, dataset_id: str, group_id: str = None) -> None:
         """
