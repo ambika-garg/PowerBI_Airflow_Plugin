@@ -43,6 +43,14 @@ class PowerBIHook(BaseHook):
         self.header = None
         super().__init__()
 
+    def get_conn(self) -> Any:
+        """
+        Function that initiates a new connection to your external tool.
+        """
+        conn = self.get_connection(self.conn_id)
+
+        return conn
+
     def refresh_dataset(self, dataset_id: str, group_id: str = None) -> None:
         """
         Triggers a refresh for the specified dataset from "My Workspace" if
@@ -115,7 +123,7 @@ class PowerBIHook(BaseHook):
         if group_id:
             url += f"/groups/{group_id}"
 
-        # add the dataset key
+        # add the dataset id
         url += f"/datasets/{dataset_id}/refreshes"
 
         # add the `top` parameter if it is specified
