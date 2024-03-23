@@ -48,6 +48,7 @@ class PowerBIHook(BaseHook):
         Function that initiates a new connection to your external tool.
         """
         conn = self.get_connection(self.conn_id)
+        self.log.info(conn)
 
         return conn
 
