@@ -142,6 +142,6 @@ class AirflowExtraLinkPlugin(AirflowPlugin):
     operator_extra_links = [
         PowerBILink(),
     ]
-    hooks= [
-        PowerBIHook,
-    ]
+    # hooks= [
+    #     PowerBIHook,
+    # ]
