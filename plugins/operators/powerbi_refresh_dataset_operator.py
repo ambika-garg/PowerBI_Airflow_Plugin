@@ -12,8 +12,6 @@ from hooks.powerbi_hook import (
     PowerBIDatasetRefreshStatus,
     PowerBIHook
 )
-from operators.powerbi_refresh_dataset_operator import PowerBILink
-
 
 class PowerBILink(BaseOperatorLink):
     """
