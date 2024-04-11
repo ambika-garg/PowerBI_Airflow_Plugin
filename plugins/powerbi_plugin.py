@@ -1,7 +1,6 @@
 """Airflow Imports"""
 from airflow.plugins_manager import AirflowPlugin
 
-# Local
 from operators.powerbi_refresh_dataset_operator import PowerBILink
 from hooks.powerbi_hook import PowerBIHook
 

@@ -4,20 +4,25 @@ from typing import Sequence
 
 from airflow.models import BaseOperator, BaseOperatorLink
 from airflow.models.taskinstancekey import TaskInstanceKey
-from airflow.models import BaseOperatorLink # type: ignore
+from airflow.models import BaseOperatorLink  # type: ignore
 from airflow.utils.context import Context
-from hooks.powerbi_hook import PowerBIDatasetRefreshException, PowerBIDatasetRefreshStatus, PowerBIHook
+from hooks.powerbi_hook import (
+    PowerBIDatasetRefreshException,
+    PowerBIDatasetRefreshStatus,
+    PowerBIHook
+)
 
 
 class PowerBILink(BaseOperatorLink):
     """
     Construct a link to monitor a dataset in Power BI.
     """
-
-
     name = "Monitor PowerBI Dataset"
 
     def get_link(self, operator: BaseOperator, *, ti_key: TaskInstanceKey):
+        """
+        Returns the link to redirect to the PowerBI.
+        """
         url = (
             f"https://app.powerbi.com"
             f"/groups/{operator.group_id}/datasets/{operator.dataset_id}"
@@ -39,8 +44,6 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
     :param group_id: The workspace id.
     :param wait_for_termination: Wait until the pre-existing or current triggered refresh completes before exiting.
     :param force_refresh: Force refresh if pre-existing refresh found.
-    :param powerbi_conn_id: Airflow Connection ID that contains the connection
-        information for the Power BI account used for authentication.
     :param timeout: Time in seconds to wait for a dataset to reach a terminal status for non-asynchronous waits. Used only if ``wait_for_termination`` is True.
     :param check_interval: Number of seconds to wait before rechecking the
         refresh status.
@@ -56,12 +59,12 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
 
     def __init__(
         self,
-        *, # Indicates all the following parameters must be specified using keyword arguments.
+        # Indicates all the following parameters must be specified using keyword arguments.
+        *,
         dataset_id: str,
         group_id: str,
         wait_for_termination: bool = True,
         force_refresh: bool = True,
-        powerbi_conn_id: str = PowerBIHook.default_conn_name,
         timeout: int = 60 * 60 * 24 * 7,
         check_interval: int = 60,
         **kwargs,
@@ -71,7 +74,6 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
         self.group_id = group_id
         self.wait_for_termination = wait_for_termination
         self.force_refresh = force_refresh
-        self.powerbi_conn_id = powerbi_conn_id
         self.timeout = timeout
         self.check_interval = check_interval
 
@@ -81,7 +83,7 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
         Create and return an PowerBIHook (cached).
         """
         return PowerBIHook(
-            dataset_id=self.dataset_id, group_id=self.group_id, powerbi_conn_id=self.powerbi_conn_id
+            dataset_id=self.dataset_id, group_id=self.group_id
         )
 
     def execute(self, context: Context):
@@ -106,11 +108,13 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
                     if self.hook.wait_for_dataset_refresh_status(
                         expected_status=PowerBIDatasetRefreshStatus.COMPLETED
                     ):
-                        self.log.info("Pre-existing Dataset refresh has completed successfully")
+                        self.log.info(
+                            "Pre-existing Dataset refresh has completed successfully")
 
                         if self.force_refresh:
                             self.log.info("Starting forced refresh.")
-                            self.hook.trigger_dataset_refresh(self.wait_for_termination)
+                            self.hook.trigger_dataset_refresh(
+                                self.wait_for_termination)
                     else:
                         raise PowerBIDatasetRefreshException(
                             "Dataset refresh has failed or has been cancelled."
@@ -122,5 +126,7 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
         end_time = refresh_details.get("end_time")
 
         # Xcom Integration
-        context["ti"].xcom_push(key="powerbi_dataset_refresh_status", value=status)
-        context["ti"].xcom_push(key="powerbi_dataset_refresh_end_time", value=end_time)
+        context["ti"].xcom_push(
+            key="powerbi_dataset_refresh_status", value=status)
+        context["ti"].xcom_push(
+            key="powerbi_dataset_refresh_end_time", value=end_time)

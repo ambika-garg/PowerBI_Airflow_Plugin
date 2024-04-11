@@ -1,7 +1,7 @@
 """Standard Library imports"""
-from typing import Any, Dict, Union
+from typing import Dict, Union
 import time
-import requests
+import requests # type: ignore
 
 from airflow.exceptions import AirflowException
 from airflow.hooks.base import BaseHook
@@ -30,47 +30,19 @@ class PowerBIHook(BaseHook):
 
     :param dataset_id: The dataset id.
     :param group_id: The workspace id.
-    :param powerbi_conn_id: Airflow Connection ID that contains the connection
-        information for the Power BI account used for authentication.
     """
 
-    conn_type: str = "powerbi"
-    conn_name_attr: str = "powerbi_conn_id"
-    default_conn_name: str = "powerbi_default"
     hook_name: str = "Power BI"
 
-    @classmethod
-    def get_connection_form_widgets(cls) -> Dict[str, Any]:
-        """Return connection widgets to add to connection form."""
-        from flask_appbuilder.fieldwidgets import BS3TextFieldWidget
-        from flask_babel import lazy_gettext
-        from wtforms import StringField
-
-        return {
-            "tenantId": StringField(lazy_gettext("Tenant ID"), widget=BS3TextFieldWidget()),
-        }
-
-    @classmethod
-    def get_ui_field_behaviour(cls) -> Dict[str, Any]:
-        """Return custom field behaviour."""
-        return {
-            "hidden_fields": ["schema", "port", "host", "extra"],
-            "relabeling": {
-                "login": "Client ID",
-                "password": "Secret",
-            },
-        }
 
     def __init__(
         self,
         *,
         dataset_id: str,
         group_id: str,
-        powerbi_conn_id: str = default_conn_name,
     ):
         self.dataset_id = dataset_id
         self.group_id = group_id
-        self.conn_id = powerbi_conn_id
         self.header = None
         self._api_version = "v1.0"
         self._base_url = "https://api.powerbi.com"
@@ -97,19 +69,20 @@ class PowerBIHook(BaseHook):
         """
         Retrieve the access token used to authenticate against the API.
         """
-        conn = self.get_connection(self.conn_id)
-        extras = conn.extra_dejson
-        tenant = extras.get("tenantId", None)
 
-        if not conn.login and conn.password:
+        client_id = Variable.get("client_id", None)
+        client_secret = Variable.get("client_secret", None)
+        tenant = Variable.get("tenant_id", None)
+
+        if not client_id or not client_secret:
             raise ValueError("A Client ID and Secret is required to authenticate with Power BI.")
 
         if not tenant:
             raise ValueError("A Tenant ID is required when authenticating with Client ID and Secret.")
 
         credential = ClientSecretCredential(
-            client_id=conn.login,
-            client_secret=conn.password,
+            client_id=client_id,
+            client_secret=client_secret,
             tenant_id=tenant
         )
 
