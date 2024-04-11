@@ -4,9 +4,7 @@ from datetime import datetime
 # The DAG object
 from airflow import DAG
 from airflow.operators.bash import BashOperator
-
-# Operators
-from operators.powerbi_refresh_dataset_operator import PowerBIDatasetRefreshOperator
+from plugins.operators.powerbi_refresh_dataset_operator import PowerBIDatasetRefreshOperator
 
 
 with DAG(
@@ -25,17 +23,10 @@ with DAG(
 
     refresh_in_given_workspace = PowerBIDatasetRefreshOperator(
         task_id="refresh_in_given_workspace",
-        dataset_id="372d46ba-e761-4c9e-b306-5d7d89676b13",
-        group_id="effb3465-0270-42ec-857a-0b2c9aafce46",
-        force_refresh = False,
+        dataset_id="5bd3c9f2-4bda-45e6-be0a-f6106b7ae38b",
+        group_id="b7f916f7-b7bf-41ca-846d-f133ec6d2a46",
+        force_refresh = True,
         # wait_for_completion = False
     )
 
-    # refresh_in_my_workspace = PowerBIDatasetRefreshOperator(
-    #     task_id="refresh_in_my_workspace",
-    #     dataset_id="372d46ba-e761-4c9e-b306-5d7d89676b13",
-    #     group_id="effb3465-0270-42ec-857a-0b2c9aafce46"
-    # )
-
-    start_dataset_refresh >> refresh_in_given_workspace #ignore
-    # >> refresh_in_my_workspace
+    start_dataset_refresh >> refresh_in_given_workspace
