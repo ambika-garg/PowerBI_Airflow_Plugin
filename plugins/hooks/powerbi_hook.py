@@ -1,5 +1,5 @@
 """Standard Library imports"""
-from typing import Any, Dict
+from typing import Any, Dict, Union
 import time
 import requests
 
