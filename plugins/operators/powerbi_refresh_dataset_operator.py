@@ -4,7 +4,6 @@ from typing import Sequence
 
 from airflow.models import BaseOperator, BaseOperatorLink
 from airflow.models.taskinstancekey import TaskInstanceKey
-from airflow.plugins_manager import AirflowPlugin
 from airflow.models import BaseOperatorLink  # type: ignore
 from airflow.utils.context import Context
 from hooks.powerbi_hook import (
@@ -129,19 +128,3 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
             key="powerbi_dataset_refresh_status", value=status)
         context["ti"].xcom_push(
             key="powerbi_dataset_refresh_end_time", value=end_time)
-
-
-
-# Defining the plugin class
-class AirflowExtraLinkPlugin(AirflowPlugin):
-    """
-    PowerBI plugin.
-    """
-
-    name = "powerbi_link_plugin"
-    operator_extra_links = [
-        PowerBILink(),
-    ]
-    # hooks= [
-    #     PowerBIHook,
-    # ]
