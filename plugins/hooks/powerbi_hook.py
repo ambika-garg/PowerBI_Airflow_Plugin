@@ -156,17 +156,24 @@ class PowerBIHook(BaseHook):
         if history is None or not history.get("value"):
             return None
 
+        logging.info(1)
+        logging.info(f"Request Id: {request_id}")
         refresh_histories = history.get("value")
 
         request_ids = [refresh_history.get("requestId") for refresh_history in refresh_histories]
+        logging.info(2)
+        logging.info(f"Request Ids Array: {request_ids}")
 
         if request_id not in request_ids:
             return None
 
         request_id_index = request_ids.index(request_id)
-        refresh_details_by_refresh_id = refresh_histories[request_id_index]
+        logging.info(3)
+        logging.info(f"Request Id index: {request_id_index}")
 
-        logging.info(refresh_details_by_refresh_id)
+        refresh_details_by_refresh_id = refresh_histories[request_id_index]
+        logging.info(4)
+        logging.info(f"Request Id index: {refresh_details_by_refresh_id}")
 
         return {
             "requestId": refresh_details_by_refresh_id.get("requestId"),
