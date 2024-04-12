@@ -64,7 +64,9 @@ class PowerBIHook(BaseHook):
         url += f"/datasets/{dataset_id}/refreshes"
 
         response = self._send_request("POST", url=url)
-        print(response.headers)
+        request_id = response.headers["RequestId"]
+
+        return request_id
 
     def _get_token(self) -> str:
         """
@@ -207,7 +209,7 @@ class PowerBIHook(BaseHook):
 
         return dataset_refresh_status in expected_status
 
-    def trigger_dataset_refresh(self, wait_for_termination: bool):
+    def trigger_dataset_refresh(self, wait_for_termination: bool) -> str:
         """
         Triggers the Power BI dataset refresh.
 
@@ -215,14 +217,16 @@ class PowerBIHook(BaseHook):
         """
         # Start dataset refresh
         self.log.info("Starting dataset refresh.")
-        self.refresh_dataset(dataset_id=self.dataset_id, group_id=self.group_id)
+        request_id = self.refresh_dataset(dataset_id=self.dataset_id, group_id=self.group_id)
 
         if wait_for_termination:
             self.log.info("Waiting for dataset refresh to terminate.")
             if self.wait_for_dataset_refresh_status(expected_status=PowerBIDatasetRefreshStatus.COMPLETED):
                 self.log.info("Dataset refresh has completed successfully")
             else:
-                raise PowerBIDatasetRefreshException("Dataset refresh has failed or has been cancelled.")
+                raise PowerBIDatasetRefreshException(f"Dataset refresh with request id {request_id} has failed or has been cancelled.")
+
+        return request_id
 
     def _send_request(self, request_type: str, url: str, **kwargs) -> requests.Response:
         """
