@@ -88,43 +88,43 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
         """
         Refresh the Power BI Dataset
         """
-        self.log.info("Check if a refresh is already in progress.")
-        refresh_details = self.hook.get_latest_refresh_details()
+        # self.log.info("Check if a refresh is already in progress.")
+        # refresh_details = self.hook.get_latest_refresh_details()
 
-        if (
-            refresh_details is None
-            or refresh_details.get("status") != PowerBIDatasetRefreshStatus.IN_PROGRESS
-        ):
-            self.log.info("No pre-existing refresh Found.")
-            self.hook.trigger_dataset_refresh(self.wait_for_termination)
-        else:
-            if refresh_details.get("status") == PowerBIDatasetRefreshStatus.IN_PROGRESS:
-                self.log.info("Found pre-existing refresh.")
+        # if (
+        #     refresh_details is None
+        #     or refresh_details.get("status") != PowerBIDatasetRefreshStatus.IN_PROGRESS
+        # ):
+        #     self.log.info("No pre-existing refresh Found.")
+        request_id = self.hook.trigger_dataset_refresh(self.wait_for_termination)
+        # else:
+        #     if refresh_details.get("status") == PowerBIDatasetRefreshStatus.IN_PROGRESS:
+        #         self.log.info("Found pre-existing refresh.")
 
-                if self.force_refresh or self.wait_for_termination:
-                    self.log.info("Waiting for dataset refresh to terminate.")
-                    if self.hook.wait_for_dataset_refresh_status(
-                        expected_status=PowerBIDatasetRefreshStatus.COMPLETED
-                    ):
-                        self.log.info(
-                            "Pre-existing Dataset refresh has completed successfully")
+        #         if self.force_refresh or self.wait_for_termination:
+        #             self.log.info("Waiting for dataset refresh to terminate.")
+        #             if self.hook.wait_for_dataset_refresh_status(
+        #                 expected_status=PowerBIDatasetRefreshStatus.COMPLETED
+        #             ):
+        #                 self.log.info(
+        #                     "Pre-existing Dataset refresh has completed successfully")
 
-                        if self.force_refresh:
-                            self.log.info("Starting forced refresh.")
-                            self.hook.trigger_dataset_refresh(
-                                self.wait_for_termination)
-                    else:
-                        raise PowerBIDatasetRefreshException(
-                            "Dataset refresh has failed or has been cancelled."
-                        )
+        #                 if self.force_refresh:
+        #                     self.log.info("Starting forced refresh.")
+        #                     self.hook.trigger_dataset_refresh(
+        #                         self.wait_for_termination)
+        #             else:
+        #                 raise PowerBIDatasetRefreshException(
+        #                     "Dataset refresh has failed or has been cancelled."
+        #                 )
 
-        # Retrieve refresh details after triggering refresh
-        refresh_details = self.hook.get_latest_refresh_details()
-        status = refresh_details.get("status")
-        end_time = refresh_details.get("end_time")
+        # # Retrieve refresh details after triggering refresh
+        # refresh_details = self.hook.get_latest_refresh_details()
+        # status = refresh_details.get("status")
+        # end_time = refresh_details.get("end_time")
 
-        # Xcom Integration
-        context["ti"].xcom_push(
-            key="powerbi_dataset_refresh_status", value=status)
-        context["ti"].xcom_push(
-            key="powerbi_dataset_refresh_end_time", value=end_time)
+        # # Xcom Integration
+        # context["ti"].xcom_push(
+        #     key="powerbi_dataset_refresh_status", value=status)
+        # context["ti"].xcom_push(
+        #     key="powerbi_dataset_refresh_end_time", value=end_time)

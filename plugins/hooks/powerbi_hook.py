@@ -63,7 +63,8 @@ class PowerBIHook(BaseHook):
         # add the dataset key
         url += f"/datasets/{dataset_id}/refreshes"
 
-        self._send_request("POST", url=url)
+        response = self._send_request("POST", url=url)
+        print(response.headers)
 
     def _get_token(self) -> str:
         """
@@ -115,9 +116,6 @@ class PowerBIHook(BaseHook):
         # add the dataset id
         url += f"/datasets/{dataset_id}/refreshes"
 
-        # add the top parameter, to return the latest refresh entry
-        url += "?$top=1"
-
         r = self._send_request("GET", url=url)
         return r.json()
 
@@ -137,7 +135,41 @@ class PowerBIHook(BaseHook):
 
         latest_refresh = history.get("value")[0]
 
-        return {"status": latest_refresh.get("status"), "end_time": latest_refresh.get("endTime")}
+        return {
+            "requestId": latest_refresh.get("requestId"),
+            "status": latest_refresh.get("status"),
+            "end_time": latest_refresh.get("endTime"),
+            "error": latest_refresh.get("serviceExceptionJson")
+        }
+
+    def get_refresh_details_by_request_id(self, request_id) -> Union[Dict[str, str], None]:
+        """
+        Get the refresh details of the given request Id.
+
+        :param request_id: Request Id of the Dataset refresh.
+        """
+        history = self.get_refresh_history(dataset_id=self.dataset_id, group_id=self.group_id)
+
+        if history is None or not history.get("value"):
+            return None
+
+        refresh_histories = history.get("value")
+
+        request_ids = [refresh_history.get("requestId") for refresh_history in refresh_histories]
+
+        if request_id not in request_ids:
+            return None
+
+        request_id_index = request_ids.index(request_id)
+        refresh_details_by_refresh_id = refresh_histories[request_id_index]
+
+        return {
+            "requestId": refresh_details_by_refresh_id.get("requestId"),
+            "status": refresh_details_by_refresh_id.get("status"),
+            "end_time": refresh_details_by_refresh_id.get("endTime"),
+            "error": refresh_details_by_refresh_id.get("serviceExceptionJson")
+        }
+
 
     def wait_for_dataset_refresh_status(
         self,
