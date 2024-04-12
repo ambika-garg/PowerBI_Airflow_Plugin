@@ -6,11 +6,8 @@ from airflow.models import BaseOperator, BaseOperatorLink
 from airflow.models.taskinstancekey import TaskInstanceKey
 from airflow.models import BaseOperatorLink  # type: ignore
 from airflow.utils.context import Context
-from hooks.powerbi_hook import (
-    PowerBIDatasetRefreshException,
-    PowerBIDatasetRefreshStatus,
-    PowerBIHook
-)
+from hooks.powerbi_hook import PowerBIDatasetRefreshException, PowerBIDatasetRefreshStatus, PowerBIHook
+
 
 class PowerBILink(BaseOperatorLink):
     """
