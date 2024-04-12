@@ -2,6 +2,7 @@
 from typing import Dict, Union
 import time
 import requests # type: ignore
+import logging
 
 from airflow.exceptions import AirflowException
 from airflow.hooks.base import BaseHook
@@ -164,6 +165,8 @@ class PowerBIHook(BaseHook):
 
         request_id_index = request_ids.index(request_id)
         refresh_details_by_refresh_id = refresh_histories[request_id_index]
+
+        logging.info(refresh_details_by_refresh_id)
 
         return {
             "requestId": refresh_details_by_refresh_id.get("requestId"),
