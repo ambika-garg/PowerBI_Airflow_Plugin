@@ -139,7 +139,7 @@ class PowerBIHook(BaseHook):
         latest_refresh = history.get("value")[0]
 
         return {
-            "requestId": latest_refresh.get("requestId"),
+            "request_id": latest_refresh.get("requestId"),
             "status": latest_refresh.get("status"),
             "end_time": latest_refresh.get("endTime"),
             "error": latest_refresh.get("serviceExceptionJson")
@@ -176,7 +176,7 @@ class PowerBIHook(BaseHook):
         logging.info(f"Request Id index: {refresh_details_by_refresh_id}")
 
         return {
-            "requestId": refresh_details_by_refresh_id.get("requestId"),
+            "request_id": refresh_details_by_refresh_id.get("requestId"),
             "status": refresh_details_by_refresh_id.get("status"),
             "end_time": refresh_details_by_refresh_id.get("endTime"),
             "error": refresh_details_by_refresh_id.get("serviceExceptionJson")
