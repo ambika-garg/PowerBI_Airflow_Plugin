@@ -1,7 +1,7 @@
 # Apache Airflow Plugin for Power BI Dataset Refresh. 🚀
 
 ## Introduction
-Get ready to enhance your Apache Airflow workflows with a new plugin designed specifically for refreshing Power BI datasets! The plugin contains the custom operator to seamlessly handle dataset refresh and it supports SPN authentication. Additionally, the operator checks for existing refreshes before triggering the new one.
+Get ready to enhance your Apache Airflow workflows with a new plugin designed for refreshing Power BI datasets! The plugin contains the custom operator to seamlessly handle dataset refresh and it supports SPN authentication. Additionally, the operator checks for existing refreshes before triggering the new one.
 
 ## How to Use
 ### Getting Started
