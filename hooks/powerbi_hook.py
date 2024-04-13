@@ -1,5 +1,5 @@
 """Standard Library imports"""
-from typing import Dict, Union, Optional
+from typing import Dict, Union
 import time
 import requests # type: ignore
 from enum import Enum
