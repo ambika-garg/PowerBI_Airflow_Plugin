@@ -273,5 +273,7 @@ class PowerBIHook(BaseHook):
 
         response = func(url=url, headers=self.header, **kwargs)
 
+        if response.ok:
+            return response
+
         response.raise_for_status()
-        return response
