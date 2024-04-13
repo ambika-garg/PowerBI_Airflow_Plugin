@@ -24,7 +24,7 @@ with DAG(
         task_id="refresh_in_given_workspace",
         dataset_id="5bd3c9f2-4bda-45e6-be0a-f6106b7ae38b",
         group_id="b7f916f7-b7bf-41ca-846d-f133ec6d2a46",
-        force_refresh = True,
+        force_refresh = False,
         wait_for_termination = False
     )
 

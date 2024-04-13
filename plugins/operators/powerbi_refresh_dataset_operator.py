@@ -59,7 +59,7 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
         dataset_id: str,
         group_id: str,
         wait_for_termination: bool = True,
-        force_refresh: bool = True,
+        force_refresh: bool = False,
         timeout: int = 60 * 60 * 24 * 7,
         check_interval: int = 60,
         **kwargs,
