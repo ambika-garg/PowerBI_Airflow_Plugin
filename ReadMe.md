@@ -17,6 +17,17 @@ Since custom connection forms aren't feasible in Apache Airflow plugins, credent
 2. `client_secret`: The Client Secret of your service principal.
 3. `tenant_id`: The Tenant Id of your service principal.
 
+## Operators
+### PowerBIDatasetRefreshOperator
+This operator composes the logic for this plugin. It triggers the Power BI dataset refresh and pushes the details in Xcom. It can accept the following parameters:
+
+* `dataset_id`: The dataset Id.
+* `group_id`: The workspace Id.
+* `wait_for_termination`: (Default value: True) Wait until the pre-existing or current triggered refresh completes before exiting.
+* `force_refresh`: When enabled, it will force refresh the dataset again, after pre-existing ongoing refresh request is terminated.
+* `timeout`: Time in seconds to wait for a dataset to reach a terminal status for non-asynchronous waits. Used only if ``wait_for_termination`` is True.
+* `check_interval`: Number of seconds to wait before rechecking the refresh status.
+
 ## Features
 * #### Xcom Integration: The Power BI Dataset refresh operator enriches the Xcom with essential fields for downstream tasks:
 1. `powerbi_dataset_refresh_id`: Request Id of the Dataset Refresh.
@@ -62,7 +73,6 @@ with DAG(
     refresh_in_given_workspace
 
 ```
-
 Feel free to tweak and tailor this DAG to suit your needs!
 
 🌟 Please feel free to share any thoughts or suggestions you have.
