@@ -276,4 +276,5 @@ class PowerBIHook(BaseHook):
         if response.ok:
             return response
 
+        self.log.info("Raising for status")
         response.raise_for_status()
