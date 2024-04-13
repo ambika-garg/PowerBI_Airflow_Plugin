@@ -1,8 +1,9 @@
 """Standard Library imports"""
-from typing import Dict, Union
+from typing import Dict, Union, Optional
 import time
 import requests # type: ignore
-import logging
+from enum import Enum
+
 
 from airflow.exceptions import AirflowException
 from airflow.hooks.base import BaseHook
@@ -10,9 +11,16 @@ from airflow.models import Variable
 from azure.identity import ClientSecretCredential
 
 
-class PowerBIDatasetRefreshStatus:
-    """Power BI refresh dataset statuses"""
+class PowerBIDatasetRefreshFields(Enum):
+    """Power BI refresh dataset details."""
+    REQUEST_ID = "request_id"
+    STATUS = "status"
+    END_TIME = "end_time"
+    ERROR = "error"
 
+
+class PowerBIDatasetRefreshStatus:
+    """Power BI refresh dataset statuses."""
     # If the completion state is unknown or a refresh is in progress.
     IN_PROGRESS = "Unknown"
     FAILED = "Failed"
@@ -32,9 +40,7 @@ class PowerBIHook(BaseHook):
     :param dataset_id: The dataset id.
     :param group_id: The workspace id.
     """
-
     hook_name: str = "Power BI"
-
 
     def __init__(
         self,
@@ -49,12 +55,14 @@ class PowerBIHook(BaseHook):
         self._base_url = "https://api.powerbi.com"
         super().__init__()
 
-    def refresh_dataset(self, dataset_id: str, group_id: str) -> None:
+    def refresh_dataset(self, dataset_id: str, group_id: str) -> str:
         """
-        Triggers a refresh for the specified dataset from the given group Id.
+        Triggers a refresh for the specified dataset from the given group id.
 
         :param dataset_id: The dataset id.
         :param group_id: The workspace id.
+
+        :return: Request id of the dataset refresh request.
         """
         url = f"{self._base_url}/{self._api_version}/myorg"
 
@@ -73,7 +81,6 @@ class PowerBIHook(BaseHook):
         """
         Retrieve the access token used to authenticate against the API.
         """
-
         client_id = Variable.get("client_id", None)
         client_secret = Variable.get("client_secret", None)
         tenant = Variable.get("tenant_id", None)
@@ -94,8 +101,6 @@ class PowerBIHook(BaseHook):
 
         access_token = credential.get_token(f"{resource}/.default")
 
-        # TODO: Check if token is generated else throw Airflow exception
-
         return access_token.token
 
     def get_refresh_history(
@@ -104,12 +109,12 @@ class PowerBIHook(BaseHook):
         group_id: str,
     ) -> dict:
         """
-        Returns the refresh history of the specified dataset from the given group Id.
+        Returns the refresh history of the specified dataset from the given group id.
 
         :param dataset_id: The dataset id.
         :param group_id: The workspace id.
 
-        :return: dict object.
+        :return: dict object containaing all the refresh histories of the dataset.
         """
         url = f"{self._base_url}/{self._api_version}/myorg"
 
@@ -119,8 +124,21 @@ class PowerBIHook(BaseHook):
         # add the dataset id
         url += f"/datasets/{dataset_id}/refreshes"
 
-        r = self._send_request("GET", url=url)
-        return r.json()
+        response = self._send_request("GET", url=url)
+        return response.json()
+
+    def raw_to_refresh_details(self, refresh_details: dict) -> Dict[str, str]:
+        """
+        Convert raw refresh details into a dictionary containing required fields.
+
+        :param refresh_details: Raw object of refresh details.
+        """
+        return {
+            PowerBIDatasetRefreshFields.REQUEST_ID: refresh_details.get("requestId"),
+            PowerBIDatasetRefreshFields.STATUS: refresh_details.get("status"),
+            PowerBIDatasetRefreshFields.END_TIME: refresh_details.get("endTime"),
+            PowerBIDatasetRefreshFields.ERROR: refresh_details.get("serviceExceptionJson")
+        }
 
     def get_latest_refresh_details(self) -> Union[Dict[str, str], None]:
         """
@@ -136,16 +154,11 @@ class PowerBIHook(BaseHook):
         if history is None or not history.get("value"):
             return None
 
-        latest_refresh = history.get("value")[0]
+        raw_refresh_details = history.get("value")[0]
 
-        return {
-            "request_id": latest_refresh.get("requestId"),
-            "status": latest_refresh.get("status"),
-            "end_time": latest_refresh.get("endTime"),
-            "error": latest_refresh.get("serviceExceptionJson")
-        }
+        return self.raw_to_refresh_details(raw_refresh_details)
 
-    def get_refresh_details_by_request_id(self, request_id) -> Union[Dict[str, str], None]:
+    def get_refresh_details_by_request_id(self, request_id) -> Dict[str, str]:
         """
         Get the refresh details of the given request Id.
 
@@ -154,57 +167,49 @@ class PowerBIHook(BaseHook):
         history = self.get_refresh_history(dataset_id=self.dataset_id, group_id=self.group_id)
 
         if history is None or not history.get("value"):
-            return None
+            raise PowerBIDatasetRefreshException(
+                f"Unable to fetch the details of dataset refresh with Request Id: {request_id}"
+            )
 
-        logging.info(1)
-        logging.info(f"Request Id: {request_id}")
         refresh_histories = history.get("value")
 
         request_ids = [refresh_history.get("requestId") for refresh_history in refresh_histories]
-        logging.info(2)
-        logging.info(f"Request Ids Array: {request_ids}")
 
         if request_id not in request_ids:
-            return None
+            raise PowerBIDatasetRefreshException(
+                f"Unable to fetch the details of dataset refresh with Request Id: {request_id}"
+            )
 
         request_id_index = request_ids.index(request_id)
-        logging.info(3)
-        logging.info(f"Request Id index: {request_id_index}")
+        raw_refresh_details = refresh_histories[request_id_index]
 
-        refresh_details_by_refresh_id = refresh_histories[request_id_index]
-        logging.info(4)
-        logging.info(f"Request Id index: {refresh_details_by_refresh_id}")
-
-        return {
-            "request_id": refresh_details_by_refresh_id.get("requestId"),
-            "status": refresh_details_by_refresh_id.get("status"),
-            "end_time": refresh_details_by_refresh_id.get("endTime"),
-            "error": refresh_details_by_refresh_id.get("serviceExceptionJson")
-        }
-
+        return self.raw_to_refresh_details(raw_refresh_details)
 
     def wait_for_dataset_refresh_status(
         self,
+        *,
         expected_status: str,
+        request_id: str,
         check_interval: int = 60,
         timeout: int = 60 * 60 * 24 * 7,
     ) -> bool:
         """
-        Wait until the dataset refresh has reached the expected status.
+        Wait until the dataset refresh of given request id has reached the expected status.
 
         :param expected_status: The desired status to check against a dataset refresh's current status.
+        :param request_id: Request id for the dataset refresh request.
         :param check_interval: Time in seconds to check on a dataset refresh's status.
         :param timeout: Time in seconds to wait for a dataset to reach a terminal status or the expected status.
-        :return: Boolean indicating if the dataset refresh has reached the ``expected_status``.
+        :return: Boolean indicating if the dataset refresh has reached the ``expected_status`` before the timeout.
         """
-        dataset_refresh_details = self.get_latest_refresh_details()
-        dataset_refresh_status = dataset_refresh_details.get("status")
+        dataset_refresh_details = self.get_refresh_details_by_request_id(request_id=request_id)
+        dataset_refresh_status = dataset_refresh_details.get(PowerBIDatasetRefreshFields.STATUS)
 
         start_time = time.monotonic()
 
         while (
             dataset_refresh_status not in PowerBIDatasetRefreshStatus.TERMINAL_STATUSES
-            and dataset_refresh_status not in expected_status
+            or dataset_refresh_status not in expected_status
         ):
             # Check if the dataset-refresh duration has exceeded the ``timeout`` configured.
             if start_time + timeout < time.monotonic():
@@ -214,8 +219,8 @@ class PowerBIHook(BaseHook):
 
             time.sleep(check_interval)
 
-            dataset_refresh_details = self.get_latest_refresh_details()
-            dataset_refresh_status = dataset_refresh_details.get("status")
+            dataset_refresh_details = self.get_refresh_details_by_request_id(request_id=request_id)
+            dataset_refresh_status = dataset_refresh_details.get(PowerBIDatasetRefreshFields.STATUS)
 
         return dataset_refresh_status in expected_status
 
@@ -231,10 +236,13 @@ class PowerBIHook(BaseHook):
 
         if wait_for_termination:
             self.log.info("Waiting for dataset refresh to terminate.")
-            if self.wait_for_dataset_refresh_status(expected_status=PowerBIDatasetRefreshStatus.COMPLETED):
-                self.log.info("Dataset refresh has completed successfully")
+            if self.wait_for_dataset_refresh_status(
+                request_id=request_id,
+                expected_status=PowerBIDatasetRefreshStatus.COMPLETED
+            ):
+                self.log.info(f"Dataset refresh {request_id} has completed successfully")
             else:
-                raise PowerBIDatasetRefreshException(f"Dataset refresh with request id {request_id} has failed or has been cancelled.")
+                raise PowerBIDatasetRefreshException(f"Dataset refresh {request_id} has failed or has been cancelled.")
 
         return request_id
 
