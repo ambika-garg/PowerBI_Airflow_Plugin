@@ -1,6 +1,6 @@
 import time
 from enum import Enum
-from typing import Any, Callable
+from typing import Any, Callable, Dict, List
 
 import requests
 from azure.identity import ClientSecretCredential
@@ -48,7 +48,7 @@ class PowerBIHook(BaseHook):
     hook_name: str = "Power BI"
 
     # @classmethod
-    # def get_connection_form_widgets(cls) -> dict[str, Any]:
+    # def get_connection_form_widgets(cls) -> Dict[str, Any]:
     #     """Return connection widgets to add to connection form."""
     #     from flask_appbuilder.fieldwidgets import BS3TextFieldWidget
     #     from flask_babel import lazy_gettext
@@ -59,7 +59,7 @@ class PowerBIHook(BaseHook):
     #     }
 
     # @classmethod
-    # def get_ui_field_behaviour(cls) -> dict[str, Any]:
+    # def get_ui_field_behaviour(cls) -> Dict[str, Any]:
     #     """Return custom field behaviour."""
     #     return {
     #         "hidden_fields": ["schema", "port", "host", "extra"],
@@ -136,7 +136,7 @@ class PowerBIHook(BaseHook):
         self,
         dataset_id: str,
         group_id: str,
-    ) -> list[dict[str, str]]:
+    ) -> List[Dict[str, str]]:
         """
         Retrieve the refresh history of the specified dataset from the given group ID.
 
@@ -164,7 +164,7 @@ class PowerBIHook(BaseHook):
             "Failed to retrieve refresh history. Status code: %s", str(response.status_code)
         )
 
-    def raw_to_refresh_details(self, refresh_details: dict) -> dict[str, str]:
+    def raw_to_refresh_details(self, refresh_details: Dict) -> Dict[str, str]:
         """
         Convert raw refresh details into a dictionary containing required fields.
 
@@ -181,7 +181,7 @@ class PowerBIHook(BaseHook):
             PowerBIDatasetRefreshFields.ERROR.value: str(refresh_details.get("serviceExceptionJson")),
         }
 
-    def get_latest_refresh_details(self, dataset_id: str, group_id: str) -> dict[str, str] | None:
+    def get_latest_refresh_details(self, dataset_id: str, group_id: str) -> Dict[str, str] | None:
         """
         Get the refresh details of the most recent dataset refresh in the refresh history of the data source.
 
@@ -195,7 +195,7 @@ class PowerBIHook(BaseHook):
         refresh_details = history[0]
         return refresh_details
 
-    def get_refresh_details_by_request_id(self, dataset_id: str, group_id: str, request_id) -> dict[str, str]:
+    def get_refresh_details_by_request_id(self, dataset_id: str, group_id: str, request_id) -> Dict[str, str]:
         """
         Get the refresh details of the given request Id.
 
@@ -293,9 +293,9 @@ class PowerBIHook(BaseHook):
         :return: The response object returned by the request.
         :raises requests.HTTPError: If the request fails (e.g., non-2xx status code).
         """
-        self.header: dict[str, str] = {}
+        self.header: Dict[str, str] = {}
 
-        request_funcs: dict[str, Callable[..., requests.Response]] = {
+        request_funcs: Dict[str, Callable[..., requests.Response]] = {
             "GET": requests.get,
             "POST": requests.post,
         }
