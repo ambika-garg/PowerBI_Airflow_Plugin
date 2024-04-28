@@ -110,8 +110,7 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
                         "Dataset refresh %s has completed successfully.", request_id)
                 else:
                     raise PowerBIDatasetRefreshException(
-                        f"Dataset refresh {
-                            request_id} has failed or has been cancelled."
+                        f"Dataset refresh {request_id} has failed or has been cancelled."
                     )
         else:
             if (
@@ -137,8 +136,7 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
                         )
                     else:
                         raise PowerBIDatasetRefreshException(
-                            f"Pre-exisintg dataset refresh {
-                                request_id} has failed or has been cancelled."
+                            f"Pre-exisintg dataset refresh {request_id} has failed or has been cancelled."
                         )
 
                     if self.force_refresh:
@@ -161,8 +159,7 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
                                     "Dataset refresh %s has completed successfully.", request_id)
                             else:
                                 raise PowerBIDatasetRefreshException(
-                                    f"Dataset refresh {
-                                        request_id} has failed or has been cancelled."
+                                    f"Dataset refresh {request_id} has failed or has been cancelled."
                                 )
 
         # Retrieve refresh details after triggering refresh
