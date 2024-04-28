@@ -4,7 +4,7 @@ from datetime import datetime
 # The DAG object
 from airflow import DAG
 from airflow.operators.bash import BashOperator
-from plugins.operators.powerbi_refresh_dataset_operator import PowerBIDatasetRefreshOperator
+from powerbi_refresh_dataset_operator import PowerBIDatasetRefreshOperator
 
 
 with DAG(
