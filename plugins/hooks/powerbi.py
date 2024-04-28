@@ -1,6 +1,6 @@
 import time
 from enum import Enum
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict, List, Union
 
 import requests
 from azure.identity import ClientSecretCredential
@@ -181,7 +181,7 @@ class PowerBIHook(BaseHook):
             PowerBIDatasetRefreshFields.ERROR.value: str(refresh_details.get("serviceExceptionJson")),
         }
 
-    def get_latest_refresh_details(self, dataset_id: str, group_id: str) -> Dict[str, str] | None:
+    def get_latest_refresh_details(self, dataset_id: str, group_id: str) -> Union[Dict[str, str], None]:
         """
         Get the refresh details of the most recent dataset refresh in the refresh history of the data source.
 
