@@ -1,36 +1,15 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-from __future__ import annotations
-
 from unittest import mock
 from unittest.mock import MagicMock
-
 import pytest
+import logging
 
 from airflow.models.connection import Connection
-from airflow.providers.microsoft.powerbi.hooks.powerbi import (
-    PowerBIDatasetRefreshException,
-    PowerBIDatasetRefreshFields,
-    PowerBIDatasetRefreshStatus,
-    PowerBIHook,
-)
+
+from plugins.hooks.powerbi import PowerBIDatasetRefreshException, PowerBIDatasetRefreshFields, PowerBIDatasetRefreshStatus, PowerBIHook
+
 
 DEFAULT_CONNECTION_CLIENT_SECRET = "powerbi_conn_id"
-MODULE = "hooks.powerbi"
+MODULE = "plugins.hooks.powerbi"
 CLIENT_ID = "client_id"
 CLIENT_SECRET = "client_secret"
 TENANT_ID = "tenant_id"
@@ -105,7 +84,7 @@ def test_get_token_with_missing_credentials(powerbi_hook):
     powerbi_hook.get_connection = MagicMock(
         return_value=Connection(
             conn_id=DEFAULT_CONNECTION_CLIENT_SECRET,
-            conn_type="powerbi",
+            conn_type="generic",
             login=None,
             password=None,
             extra={
@@ -120,10 +99,11 @@ def test_get_token_with_missing_credentials(powerbi_hook):
 
 def test_get_token_with_missing_tenant_id(powerbi_hook):
     # Mock the get_connection method to return a connection with missing tenant ID
+    logging.info("0")
     powerbi_hook.get_connection = MagicMock(
         return_value=Connection(
             conn_id=DEFAULT_CONNECTION_CLIENT_SECRET,
-            conn_type="powerbi",
+            conn_type="generic",
             login=CLIENT_ID,
             password=CLIENT_SECRET,
             extra={},
@@ -140,7 +120,7 @@ def test_get_token_with_valid_credentials(mock_credential, powerbi_hook):
     powerbi_hook.get_connection = MagicMock(
         return_value=Connection(
             conn_id=DEFAULT_CONNECTION_CLIENT_SECRET,
-            conn_type="powerbi",
+            conn_type="generic",
             login=CLIENT_ID,
             password=CLIENT_SECRET,
             extra={
@@ -165,13 +145,15 @@ def test_refresh_dataset(powerbi_hook, requests_mock, get_token):
         headers={"Authorization": f"Bearer {get_token}", "RequestId": request_id},
     )
 
-    result = powerbi_hook.refresh_dataset(dataset_id=DATASET_ID, group_id=GROUP_ID)
+    result = powerbi_hook.refresh_dataset(
+        dataset_id=DATASET_ID, group_id=GROUP_ID)
 
     assert result == request_id
 
 
 def test_get_refresh_history_success(powerbi_hook, requests_mock, get_token):
-    url = f"{BASE_URL}/{API_VERSION}/myorg/groups/{GROUP_ID}/datasets/{DATASET_ID}/refreshes"
+    url = f"{
+        BASE_URL}/{API_VERSION}/myorg/groups/{GROUP_ID}/datasets/{DATASET_ID}/refreshes"
 
     requests_mock.get(
         url, json=API_RAW_RESPONSE, headers={"Authorization": f"Bearer {get_token}"}, status_code=200
@@ -187,7 +169,8 @@ def test_get_latest_refresh_details_with_no_history(powerbi_hook):
     # Mock the get_refresh_history method to return an empty list
     powerbi_hook.get_refresh_history = MagicMock(return_value=[])
 
-    result = powerbi_hook.get_latest_refresh_details(dataset_id=DATASET_ID, group_id=GROUP_ID)
+    result = powerbi_hook.get_latest_refresh_details(
+        dataset_id=DATASET_ID, group_id=GROUP_ID)
 
     assert result is None
 
@@ -197,7 +180,8 @@ def test_get_latest_refresh_details_with_history(powerbi_hook):
     refresh_history = FORMATTED_RESPONSE
     powerbi_hook.get_refresh_history = MagicMock(return_value=refresh_history)
 
-    result = powerbi_hook.get_latest_refresh_details(dataset_id=DATASET_ID, group_id=GROUP_ID)
+    result = powerbi_hook.get_latest_refresh_details(
+        dataset_id=DATASET_ID, group_id=GROUP_ID)
 
     assert result == FORMATTED_RESPONSE[0]
 
@@ -205,7 +189,8 @@ def test_get_latest_refresh_details_with_history(powerbi_hook):
 def test_get_refresh_details_by_request_id(powerbi_hook):
     # Mock the get_refresh_history method to return a list of refresh histories
     refresh_histories = FORMATTED_RESPONSE
-    powerbi_hook.get_refresh_history = MagicMock(return_value=refresh_histories)
+    powerbi_hook.get_refresh_history = MagicMock(
+        return_value=refresh_histories)
 
     # Call the function with a valid request ID
     request_id = "5e2d9921-e91b-491f-b7e1-e7d8db49194c"
@@ -230,9 +215,12 @@ def test_get_refresh_details_by_request_id(powerbi_hook):
 
 
 _wait_for_dataset_refresh_status_test_args = [
-    (PowerBIDatasetRefreshStatus.COMPLETED, PowerBIDatasetRefreshStatus.COMPLETED, True),
-    (PowerBIDatasetRefreshStatus.FAILED, PowerBIDatasetRefreshStatus.COMPLETED, False),
-    (PowerBIDatasetRefreshStatus.IN_PROGRESS, PowerBIDatasetRefreshStatus.COMPLETED, "timeout"),
+    (PowerBIDatasetRefreshStatus.COMPLETED,
+     PowerBIDatasetRefreshStatus.COMPLETED, True),
+    (PowerBIDatasetRefreshStatus.FAILED,
+     PowerBIDatasetRefreshStatus.COMPLETED, False),
+    (PowerBIDatasetRefreshStatus.IN_PROGRESS,
+     PowerBIDatasetRefreshStatus.COMPLETED, "timeout"),
 ]
 
 
@@ -257,11 +245,14 @@ def test_wait_for_dataset_refresh_status(
     }
 
     # Mock the get_refresh_details_by_request_id method to return a dataset refresh details
-    dataset_refresh_details = {PowerBIDatasetRefreshFields.STATUS.value: dataset_refresh_status}
-    powerbi_hook.get_refresh_details_by_request_id = MagicMock(return_value=dataset_refresh_details)
+    dataset_refresh_details = {
+        PowerBIDatasetRefreshFields.STATUS.value: dataset_refresh_status}
+    powerbi_hook.get_refresh_details_by_request_id = MagicMock(
+        return_value=dataset_refresh_details)
 
     if expected_result != "timeout":
-        assert powerbi_hook.wait_for_dataset_refresh_status(**config) == expected_result
+        assert powerbi_hook.wait_for_dataset_refresh_status(
+            **config) == expected_result
     else:
         with pytest.raises(PowerBIDatasetRefreshException):
             powerbi_hook.wait_for_dataset_refresh_status(**config)
@@ -272,6 +263,7 @@ def test_trigger_dataset_refresh(powerbi_hook):
     powerbi_hook.refresh_dataset = MagicMock(return_value="request_id")
 
     # Assert trigger_dataset_refresh raises an exception.
-    response = powerbi_hook.trigger_dataset_refresh(dataset_id=DATASET_ID, group_id=GROUP_ID)
+    response = powerbi_hook.trigger_dataset_refresh(
+        dataset_id=DATASET_ID, group_id=GROUP_ID)
 
     assert response == "request_id"

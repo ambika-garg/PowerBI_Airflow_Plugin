@@ -87,7 +87,7 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
             dataset_id=self.dataset_id, group_id=self.group_id
         )
 
-        if (
+        if(
             refresh_details is None
             or refresh_details.get(PowerBIDatasetRefreshFields.STATUS.value)
             in PowerBIDatasetRefreshStatus.TERMINAL_STATUSES
