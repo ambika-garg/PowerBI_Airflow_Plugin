@@ -12,10 +12,14 @@ Before diving in,
 * You must have <strong>Admin account of Power BI</strong>.
 * The plugin supports the <strong>SPN (Service Principal) authentication</strong> with the Power BI. You need to add your service prinicpal as the <strong>Contributor</strong> in your Power BI workspace.
 
-Since custom connection forms aren't feasible in Apache Airflow plugins, credentials must be stored in the secret backend. Here's what you need to store:
-1. `client_id`: The Client ID of your service principal.
-2. `client_secret`: The Client Secret of your service principal.
-3. `tenant_id`: The Tenant Id of your service principal.
+Since custom connection forms aren't feasible in Apache Airflow plugins, use can use `Generic` connection type. Here's what you need to store:
+1. `Connection Id`: Name of the connection Id
+2. `Connection Type`: Generic
+3. `Login`: The Client ID of your service principal.
+4. `Password`: The Client Secret of your service principal.
+3. `Extra`: {
+    "tenantId": The Tenant Id of your service principal.
+}
 
 ## Operators
 ### PowerBIDatasetRefreshOperator

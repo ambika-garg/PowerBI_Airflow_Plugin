@@ -5,11 +5,11 @@ import logging
 
 from airflow.models.connection import Connection
 
-from plugins.hooks.powerbi import PowerBIDatasetRefreshException, PowerBIDatasetRefreshFields, PowerBIDatasetRefreshStatus, PowerBIHook
+from src.airflow_powerbi_plugin.hooks.powerbi import PowerBIDatasetRefreshException, PowerBIDatasetRefreshFields, PowerBIDatasetRefreshStatus, PowerBIHook
 
 
 DEFAULT_CONNECTION_CLIENT_SECRET = "powerbi_conn_id"
-MODULE = "plugins.hooks.powerbi"
+MODULE = "src.powerbi_dataset_refresh.hooks.powerbi"
 CLIENT_ID = "client_id"
 CLIENT_SECRET = "client_secret"
 TENANT_ID = "tenant_id"

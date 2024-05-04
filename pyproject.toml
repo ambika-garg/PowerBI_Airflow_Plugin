@@ -1,29 +1,19 @@
-[tool.poetry]
+[project]
 name = "airflow_powerbi_plugin"
-version = "0.1.0"
+version = "0.0.1"
+authors = [
+  { name="Ambika Garg", email="ambikagarg1101@gmail.com" },
+]
 description = "Airflow PowerBI plugin"
-authors = ["Ambika Garg <ambikagarg1101@gmail.com>"]
-license = "Apache-2.0"
-
 readme = "README.md"
-
-homepage = "https://github.com/ambika-garg/PowerBI_Airflow_Plugin"
-repository = "https://github.com/ambika-garg/PowerBI_Airflow_Plugin.git"
-
-keywords = ["airflow", "powerbi", "data"]
-
+requires-python = ">=3.8"
 classifiers = [
+    "Programming Language :: Python :: 3",
     "Development Status :: 3 - Alpha",
     "Environment :: Plugins",
     "Intended Audience :: Developers",
     "Topic :: Software Development :: Libraries :: Python Modules"
 ]
 
-[tool.poetry.dependencies]
-python = "^2.7.5 || ^3.5"
-apache-airflow = {version = "^1.10.9", optional = true}
-boto3 = "^1.10"
-
-[build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
+[project.urls]
+Homepage = "https://github.com/ambika-garg/PowerBI_Airflow_Plugin"

@@ -1,8 +1,8 @@
 """Airflow Imports"""
 from airflow.plugins_manager import AirflowPlugin
 
-from operators.powerbi_refresh_dataset_operator import PowerBILink
-from hooks.powerbi import PowerBIHook
+from airflow_powerbi_plugin.hooks.powerbi import PowerBIHook
+from airflow_powerbi_plugin.operators.powerbi import PowerBILink
 
 # Defining the plugin class
 class AirflowExtraLinkPlugin(AirflowPlugin):

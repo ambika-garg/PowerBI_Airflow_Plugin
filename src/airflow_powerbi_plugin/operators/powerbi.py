@@ -7,7 +7,7 @@ from airflow.models.taskinstancekey import TaskInstanceKey
 from airflow.models import BaseOperatorLink  # type: ignore
 from airflow.utils.context import Context
 
-from hooks.powerbi import PowerBIDatasetRefreshException, PowerBIDatasetRefreshFields, PowerBIDatasetRefreshStatus, PowerBIHook
+from airflow_powerbi_plugin.hooks.powerbi import PowerBIDatasetRefreshException, PowerBIDatasetRefreshFields, PowerBIDatasetRefreshStatus, PowerBIHook
 
 
 class PowerBILink(BaseOperatorLink):
@@ -87,7 +87,7 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
             dataset_id=self.dataset_id, group_id=self.group_id
         )
 
-        if(
+        if (
             refresh_details is None
             or refresh_details.get(PowerBIDatasetRefreshFields.STATUS.value)
             in PowerBIDatasetRefreshStatus.TERMINAL_STATUSES
@@ -110,7 +110,8 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
                         "Dataset refresh %s has completed successfully.", request_id)
                 else:
                     raise PowerBIDatasetRefreshException(
-                        f"Dataset refresh {request_id} has failed or has been cancelled."
+                        f"Dataset refresh {
+                            request_id} has failed or has been cancelled."
                     )
         else:
             if (
@@ -136,7 +137,8 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
                         )
                     else:
                         raise PowerBIDatasetRefreshException(
-                            f"Pre-exisintg dataset refresh {request_id} has failed or has been cancelled."
+                            f"Pre-exisintg dataset refresh {
+                                request_id} has failed or has been cancelled."
                         )
 
                     if self.force_refresh:
@@ -159,7 +161,8 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
                                     "Dataset refresh %s has completed successfully.", request_id)
                             else:
                                 raise PowerBIDatasetRefreshException(
-                                    f"Dataset refresh {request_id} has failed or has been cancelled."
+                                    f"Dataset refresh {
+                                        request_id} has failed or has been cancelled."
                                 )
 
         # Retrieve refresh details after triggering refresh

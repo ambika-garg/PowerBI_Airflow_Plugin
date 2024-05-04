@@ -21,13 +21,13 @@ from unittest.mock import MagicMock, call
 
 import pytest
 
-from plugins.hooks.powerbi import (
+from src.airflow_powerbi_plugin.hooks.powerbi import (
     PowerBIDatasetRefreshException,
     PowerBIDatasetRefreshFields,
     PowerBIDatasetRefreshStatus,
     PowerBIHook,
 )
-from plugins.operators.powerbi_refresh_dataset_operator import PowerBIDatasetRefreshOperator
+from src.airflow_powerbi_plugin.operators.powerbi import PowerBIDatasetRefreshOperator
 
 
 DEFAULT_CONNECTION_CLIENT_SECRET = "powerbi_conn_id"
