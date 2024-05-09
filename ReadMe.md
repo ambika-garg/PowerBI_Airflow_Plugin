@@ -34,14 +34,14 @@ This operator composes the logic for this plugin. It triggers the Power BI datas
 
 ## Features
 * #### Xcom Integration: The Power BI Dataset refresh operator enriches the Xcom with essential fields for downstream tasks:
-1. `powerbi_dataset_refresh_id`: Request Id of the Dataset Refresh.
-2. `powerbi_dataset_refresh_status`: Refresh Status.
+1. `refresh_id`: Request Id of the  semantic model refresh.
+2. `refresh_status`: Refresh Status.
     * `Unknown`: Refresh state is unknown or a refresh is in progress.
     * `Completed`: Refresh successfully completed.
-    * `Failed`: Refresh failed (details in `powerbi_dataset_refresh_error`).
+    * `Failed`: Refresh failed (details in `refresh_error`).
     * `Disabled`: Refresh is disabled by a selective refresh.
-3. `powerbi_dataset_refresh_end_time`: The end date and time of the refresh (may be None if a refresh is in progress)
-4. `powerbi_dataset_refresh_error`: Failure error code in JSON format (None if no error)
+3. `refresh_end_time`: The end date and time of the refresh (may be None if a refresh is in progress)
+4. `refresh_error`: Failure error code in JSON format (None if no error)
 
 * #### External Monitoring link: The operator conveniently provides a redirect link to the Power BI UI for monitoring refreshes.
 

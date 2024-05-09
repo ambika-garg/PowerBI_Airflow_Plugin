@@ -127,10 +127,10 @@ def test_execute_no_wait_for_termination(mock_powerbi_hook, latest_refresh_detai
     assert mock_powerbi_hook.get_refresh_details_by_request_id.called
     assert context["ti"].xcom_push.call_count == 4
     assert context["ti"].xcom_push.call_args_list == [
-        call(key="powerbi_dataset_refresh_id", value=new_refresh_request_id),
-        call(key="powerbi_dataset_refresh_status", value=PowerBIDatasetRefreshStatus.COMPLETED),
-        call(key="powerbi_dataset_refresh_end_time", value="2024-04-15T20:14:08.1458221Z"),
-        call(key="powerbi_dataset_refresh_error", value="None"),
+        call(key="refresh_id", value=new_refresh_request_id),
+        call(key="refresh_status", value=PowerBIDatasetRefreshStatus.COMPLETED),
+        call(key="refresh_end_time", value="2024-04-15T20:14:08.1458221Z"),
+        call(key="refresh_error", value="None"),
     ]
 
 
@@ -182,10 +182,10 @@ def test_execute_wait_for_termination_preexisting_refresh_going_on(
         assert mock_powerbi_hook.wait_for_dataset_refresh_status.call_count == 2
         assert context["ti"].xcom_push.call_count == 4
         assert context["ti"].xcom_push.call_args_list == [
-            call(key="powerbi_dataset_refresh_id", value=new_refresh_request_id),
-            call(key="powerbi_dataset_refresh_status", value=PowerBIDatasetRefreshStatus.COMPLETED),
-            call(key="powerbi_dataset_refresh_end_time", value="2024-04-15T20:14:08.1458221Z"),
-            call(key="powerbi_dataset_refresh_error", value="None"),
+            call(key="refresh_id", value=new_refresh_request_id),
+            call(key="refresh_status", value=PowerBIDatasetRefreshStatus.COMPLETED),
+            call(key="refresh_end_time", value="2024-04-15T20:14:08.1458221Z"),
+            call(key="refresh_error", value="None"),
         ]
 
 
@@ -253,10 +253,10 @@ def test_execute_wait_for_termination_no_preexisting_refresh(
         assert context["ti"].xcom_push.call_count == 4
         assert context["ti"].xcom_push.call_args_list == [
             call(
-                key="powerbi_dataset_refresh_id",
+                key="refresh_id",
                 value=new_refresh_request_id,
             ),
-            call(key="powerbi_dataset_refresh_status", value=PowerBIDatasetRefreshStatus.COMPLETED),
-            call(key="powerbi_dataset_refresh_end_time", value="2024-04-15T20:14:08.1458221Z"),
-            call(key="powerbi_dataset_refresh_error", value="None"),
+            call(key="refresh_status", value=PowerBIDatasetRefreshStatus.COMPLETED),
+            call(key="refresh_end_time", value="2024-04-15T20:14:08.1458221Z"),
+            call(key="refresh_error", value="None"),
         ]

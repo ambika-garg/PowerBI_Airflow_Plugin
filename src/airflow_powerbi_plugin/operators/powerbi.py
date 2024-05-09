@@ -181,10 +181,10 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
 
         # Xcom Integration
         context["ti"].xcom_push(
-            key="powerbi_dataset_refresh_id", value=request_id)
+            key="refresh_id", value=request_id)
         context["ti"].xcom_push(
-            key="powerbi_dataset_refresh_status", value=status)
+            key="refresh_status", value=status)
         context["ti"].xcom_push(
-            key="powerbi_dataset_refresh_end_time", value=end_time)
+            key="refresh_end_time", value=end_time)
         context["ti"].xcom_push(
-            key="powerbi_dataset_refresh_error", value=error)
+            key="refresh_error", value=error)
