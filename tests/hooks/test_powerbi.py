@@ -152,8 +152,7 @@ def test_refresh_dataset(powerbi_hook, requests_mock, get_token):
 
 
 def test_get_refresh_history_success(powerbi_hook, requests_mock, get_token):
-    url = f"{
-        BASE_URL}/{API_VERSION}/myorg/groups/{GROUP_ID}/datasets/{DATASET_ID}/refreshes"
+    url = f"{BASE_URL}/{API_VERSION}/myorg/groups/{GROUP_ID}/datasets/{DATASET_ID}/refreshes"
 
     requests_mock.get(
         url, json=API_RAW_RESPONSE, headers={"Authorization": f"Bearer {get_token}"}, status_code=200

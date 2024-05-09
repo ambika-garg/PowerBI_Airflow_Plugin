@@ -1,6 +1,6 @@
 [project]
 name = "airflow_powerbi_plugin"
-version = "0.0.1"
+version = "0.0.3a1"
 authors = [
   { name="Ambika Garg", email="ambikagarg1101@gmail.com" },
 ]

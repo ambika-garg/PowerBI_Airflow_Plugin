@@ -110,16 +110,14 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
                         "Dataset refresh %s has completed successfully.", request_id)
                 else:
                     raise PowerBIDatasetRefreshException(
-                        f"Dataset refresh {
-                            request_id} has failed or has been cancelled."
+                        f"Dataset refresh {request_id} has failed or has been cancelled."
                     )
         else:
             if (
                 refresh_details.get(PowerBIDatasetRefreshFields.STATUS.value)
                 == PowerBIDatasetRefreshStatus.IN_PROGRESS
             ):
-                request_id = str(refresh_details.get(
-                    PowerBIDatasetRefreshFields.REQUEST_ID.value))
+                request_id = str(refresh_details.get(PowerBIDatasetRefreshFields.REQUEST_ID.value))
                 self.log.info(
                     "Found pre-existing dataset refresh request: %s.", request_id)
 
@@ -137,8 +135,7 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
                         )
                     else:
                         raise PowerBIDatasetRefreshException(
-                            f"Pre-exisintg dataset refresh {
-                                request_id} has failed or has been cancelled."
+                            f"Pre-exisintg dataset refresh {request_id} has failed or has been cancelled."
                         )
 
                     if self.force_refresh:
@@ -161,8 +158,7 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
                                     "Dataset refresh %s has completed successfully.", request_id)
                             else:
                                 raise PowerBIDatasetRefreshException(
-                                    f"Dataset refresh {
-                                        request_id} has failed or has been cancelled."
+                                    f"Dataset refresh {request_id} has failed or has been cancelled."
                                 )
 
         # Retrieve refresh details after triggering refresh
