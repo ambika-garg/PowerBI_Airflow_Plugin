@@ -102,6 +102,8 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
                 if self.force_refresh or self.wait_for_termination:
                     self.log.info(f"Waiting for dataset refresh {request_id} to terminate.")
                     if self.hook.wait_for_dataset_refresh_status(
+                        check_interval=self.check_interval
+                        timeout=self.timeout
                         request_id=request_id,
                         expected_status=PowerBIDatasetRefreshStatus.COMPLETED
                     ):
