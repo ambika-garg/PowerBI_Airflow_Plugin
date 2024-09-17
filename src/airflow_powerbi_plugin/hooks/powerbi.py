@@ -42,32 +42,8 @@ class PowerBIHook(BaseHook):
         information for the Power BI account used for authentication.
     """
 
-    # conn_type: str = "powerbi"
-    # conn_name_attr: str = "powerbi_conn_id"
     default_conn_name: str = "powerbi_default"
     hook_name: str = "Power BI"
-
-    # @classmethod
-    # def get_connection_form_widgets(cls) -> Dict[str, Any]:
-    #     """Return connection widgets to add to connection form."""
-    #     from flask_appbuilder.fieldwidgets import BS3TextFieldWidget
-    #     from flask_babel import lazy_gettext
-    #     from wtforms import StringField
-
-    #     return {
-    #         "tenantId": StringField(lazy_gettext("Tenant ID"), widget=BS3TextFieldWidget()),
-    #     }
-
-    # @classmethod
-    # def get_ui_field_behaviour(cls) -> Dict[str, Any]:
-    #     """Return custom field behaviour."""
-    #     return {
-    #         "hidden_fields": ["schema", "port", "host", "extra"],
-    #         "relabeling": {
-    #             "login": "Client ID",
-    #             "password": "Secret",
-    #         },
-    #     }
 
     def __init__(
         self,
@@ -117,10 +93,14 @@ class PowerBIHook(BaseHook):
         tenant = extras.get("tenantId", None)
 
         if not conn.login or not conn.password:
-            raise ValueError("A Client ID and Secret is required to authenticate with Power BI.")
+            raise ValueError(
+                "A Client ID and Secret is required to authenticate with Power BI."
+            )
 
         if not tenant:
-            raise ValueError("A Tenant ID is required when authenticating with Client ID and Secret.")
+            raise ValueError(
+                "A Tenant ID is required when authenticating with Client ID and Secret."
+            )
 
         credential = ClientSecretCredential(
             client_id=conn.login, client_secret=conn.password, tenant_id=tenant
@@ -158,10 +138,14 @@ class PowerBIHook(BaseHook):
         if raw_response.ok:
             response = raw_response.json()
             refresh_histories = response.get("value")
-            return [self.raw_to_refresh_details(refresh_history) for refresh_history in refresh_histories]
+            return [
+                self.raw_to_refresh_details(refresh_history)
+                for refresh_history in refresh_histories
+            ]
 
         raise PowerBIDatasetRefreshException(
-            "Failed to retrieve refresh history. Status code: %s", str(response.status_code)
+            "Failed to retrieve refresh history. Status code: %s",
+            str(raw_response.status_code),
         )
 
     def raw_to_refresh_details(self, refresh_details: Dict) -> Dict[str, str]:
@@ -171,17 +155,25 @@ class PowerBIHook(BaseHook):
         :param refresh_details: Raw object of refresh details.
         """
         return {
-            PowerBIDatasetRefreshFields.REQUEST_ID.value: str(refresh_details.get("requestId")),
+            PowerBIDatasetRefreshFields.REQUEST_ID.value: str(
+                refresh_details.get("requestId")
+            ),
             PowerBIDatasetRefreshFields.STATUS.value: (
                 "In Progress"
                 if str(refresh_details.get("status")) == "Unknown"
                 else str(refresh_details.get("status"))
             ),
-            PowerBIDatasetRefreshFields.END_TIME.value: str(refresh_details.get("endTime")),
-            PowerBIDatasetRefreshFields.ERROR.value: str(refresh_details.get("serviceExceptionJson")),
+            PowerBIDatasetRefreshFields.END_TIME.value: str(
+                refresh_details.get("endTime")
+            ),
+            PowerBIDatasetRefreshFields.ERROR.value: str(
+                refresh_details.get("serviceExceptionJson")
+            ),
         }
 
-    def get_latest_refresh_details(self, dataset_id: str, group_id: str) -> Union[Dict[str, str], None]:
+    def get_latest_refresh_details(
+        self, dataset_id: str, group_id: str
+    ) -> Union[Dict[str, str], None]:
         """
         Get the refresh details of the most recent dataset refresh in the refresh history of the data source.
 
@@ -195,13 +187,17 @@ class PowerBIHook(BaseHook):
         refresh_details = history[0]
         return refresh_details
 
-    def get_refresh_details_by_request_id(self, dataset_id: str, group_id: str, request_id) -> Dict[str, str]:
+    def get_refresh_details_by_request_id(
+        self, dataset_id: str, group_id: str, request_id
+    ) -> Dict[str, str]:
         """
         Get the refresh details of the given request Id.
 
         :param request_id: Request Id of the Dataset refresh.
         """
-        refresh_histories = self.get_refresh_history(dataset_id=dataset_id, group_id=group_id)
+        refresh_histories = self.get_refresh_history(
+            dataset_id=dataset_id, group_id=group_id
+        )
 
         if len(refresh_histories) == 0:
             raise PowerBIDatasetRefreshException(
@@ -245,7 +241,9 @@ class PowerBIHook(BaseHook):
         dataset_refresh_details = self.get_refresh_details_by_request_id(
             dataset_id=dataset_id, group_id=group_id, request_id=request_id
         )
-        dataset_refresh_status = dataset_refresh_details.get(PowerBIDatasetRefreshFields.STATUS.value)
+        dataset_refresh_status = dataset_refresh_details.get(
+            PowerBIDatasetRefreshFields.STATUS.value
+        )
 
         start_time = time.monotonic()
 
@@ -264,7 +262,9 @@ class PowerBIHook(BaseHook):
             dataset_refresh_details = self.get_refresh_details_by_request_id(
                 dataset_id=dataset_id, group_id=group_id, request_id=request_id
             )
-            dataset_refresh_status = dataset_refresh_details.get(PowerBIDatasetRefreshFields.STATUS.value)
+            dataset_refresh_status = dataset_refresh_details.get(
+                PowerBIDatasetRefreshFields.STATUS.value
+            )
 
         return dataset_refresh_status == expected_status
 
@@ -302,6 +302,8 @@ class PowerBIHook(BaseHook):
 
         func: Callable[..., requests.Response] = request_funcs[request_type.upper()]
 
-        response = func(url=url, headers={"Authorization": f"Bearer {self._get_token()}"}, **kwargs)
+        response = func(
+            url=url, headers={"Authorization": f"Bearer {self._get_token()}"}, **kwargs
+        )
 
         return response
