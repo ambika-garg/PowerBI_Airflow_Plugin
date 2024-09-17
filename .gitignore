@@ -1,1 +1,6 @@
 .DS_Store
+docker-compose.yaml
+config/
+logs/
+__pycache__/
+.env

@@ -53,6 +53,10 @@ class PowerBIHook(BaseHook):
         self.conn_id = powerbi_conn_id
         self._api_version = "v1.0"
         self._base_url = "https://api.powerbi.com"
+        self.cached_access_token: dict[str, str | None | int] = {
+            "access_token": None,
+            "expiry_time": 0,
+        }
         super().__init__()
 
     def refresh_dataset(self, dataset_id: str, group_id: str) -> str:
@@ -88,6 +92,12 @@ class PowerBIHook(BaseHook):
         conn.login: Client ID
         conn.password: Client Secret
         """
+        access_token = self.cached_access_token.get("access_token")
+        expiry_time = self.cached_access_token.get("expiry_time")
+
+        if access_token and expiry_time > time.time():
+            return str(access_token)
+
         conn = self.get_connection(self.conn_id)
         extras = conn.extra_dejson
         tenant = extras.get("tenantId", None)
@@ -109,6 +119,11 @@ class PowerBIHook(BaseHook):
         resource = "https://analysis.windows.net/powerbi/api"
 
         access_token = credential.get_token(f"{resource}/.default")
+
+        self.cached_access_token = {
+            "access_token": access_token.token,
+            "expiry_time": time.time() + access_token.expires_on,
+        }
 
         return access_token.token
 
@@ -134,6 +149,7 @@ class PowerBIHook(BaseHook):
         url += f"/datasets/{dataset_id}/refreshes"
 
         raw_response = self._send_request("GET", url=url)
+        print(raw_response)
 
         if raw_response.ok:
             response = raw_response.json()
