@@ -1,4 +1,5 @@
 """Standard imports"""
+
 from functools import cached_property
 from typing import Sequence
 
@@ -7,7 +8,12 @@ from airflow.models.taskinstancekey import TaskInstanceKey
 from airflow.models import BaseOperatorLink  # type: ignore
 from airflow.utils.context import Context
 
-from airflow_powerbi_plugin.hooks.powerbi import PowerBIDatasetRefreshException, PowerBIDatasetRefreshFields, PowerBIDatasetRefreshStatus, PowerBIHook
+from airflow_powerbi_plugin.hooks.powerbi import (
+    PowerBIDatasetRefreshException,
+    PowerBIDatasetRefreshFields,
+    PowerBIDatasetRefreshStatus,
+    PowerBIHook,
+)
 
 
 class PowerBILink(BaseOperatorLink):
@@ -101,13 +107,16 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
             if self.wait_for_termination:
                 self.log.info("Waiting for dataset refresh to terminate.")
                 if self.hook.wait_for_dataset_refresh_status(
+                    check_interval=self.check_interval,
+                    timeout=self.timeout,
                     request_id=request_id,
                     dataset_id=self.dataset_id,
                     group_id=self.group_id,
                     expected_status=PowerBIDatasetRefreshStatus.COMPLETED,
                 ):
                     self.log.info(
-                        "Dataset refresh %s has completed successfully.", request_id)
+                        "Dataset refresh %s has completed successfully.", request_id
+                    )
                 else:
                     raise PowerBIDatasetRefreshException(
                         f"Dataset refresh {request_id} has failed or has been cancelled."
@@ -117,13 +126,17 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
                 refresh_details.get(PowerBIDatasetRefreshFields.STATUS.value)
                 == PowerBIDatasetRefreshStatus.IN_PROGRESS
             ):
-                request_id = str(refresh_details.get(PowerBIDatasetRefreshFields.REQUEST_ID.value))
+                request_id = str(
+                    refresh_details.get(PowerBIDatasetRefreshFields.REQUEST_ID.value)
+                )
                 self.log.info(
-                    "Found pre-existing dataset refresh request: %s.", request_id)
+                    "Found pre-existing dataset refresh request: %s.", request_id
+                )
 
                 if self.force_refresh or self.wait_for_termination:
                     self.log.info(
-                        "Waiting for dataset refresh %s to terminate.", request_id)
+                        "Waiting for dataset refresh %s to terminate.", request_id
+                    )
                     if self.hook.wait_for_dataset_refresh_status(
                         request_id=request_id,
                         dataset_id=self.dataset_id,
@@ -131,7 +144,8 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
                         expected_status=PowerBIDatasetRefreshStatus.COMPLETED,
                     ):
                         self.log.info(
-                            "Pre-existing dataset refresh %s has completed successfully.", request_id
+                            "Pre-existing dataset refresh %s has completed successfully.",
+                            request_id,
                         )
                     else:
                         raise PowerBIDatasetRefreshException(
@@ -146,8 +160,7 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
                         )
 
                         if self.wait_for_termination:
-                            self.log.info(
-                                "Waiting for dataset refresh to terminate.")
+                            self.log.info("Waiting for dataset refresh to terminate.")
                             if self.hook.wait_for_dataset_refresh_status(
                                 request_id=request_id,
                                 dataset_id=self.dataset_id,
@@ -155,7 +168,9 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
                                 expected_status=PowerBIDatasetRefreshStatus.COMPLETED,
                             ):
                                 self.log.info(
-                                    "Dataset refresh %s has completed successfully.", request_id)
+                                    "Dataset refresh %s has completed successfully.",
+                                    request_id,
+                                )
                             else:
                                 raise PowerBIDatasetRefreshException(
                                     f"Dataset refresh {request_id} has failed or has been cancelled."
@@ -166,21 +181,15 @@ class PowerBIDatasetRefreshOperator(BaseOperator):
             dataset_id=self.dataset_id, group_id=self.group_id, request_id=request_id
         )
 
-        request_id = str(refresh_details.get(
-            PowerBIDatasetRefreshFields.REQUEST_ID.value))
-        status = str(refresh_details.get(
-            PowerBIDatasetRefreshFields.STATUS.value))
-        end_time = str(refresh_details.get(
-            PowerBIDatasetRefreshFields.END_TIME.value))
-        error = str(refresh_details.get(
-            PowerBIDatasetRefreshFields.ERROR.value))
+        request_id = str(
+            refresh_details.get(PowerBIDatasetRefreshFields.REQUEST_ID.value)
+        )
+        status = str(refresh_details.get(PowerBIDatasetRefreshFields.STATUS.value))
+        end_time = str(refresh_details.get(PowerBIDatasetRefreshFields.END_TIME.value))
+        error = str(refresh_details.get(PowerBIDatasetRefreshFields.ERROR.value))
 
         # Xcom Integration
-        context["ti"].xcom_push(
-            key="refresh_id", value=request_id)
-        context["ti"].xcom_push(
-            key="refresh_status", value=status)
-        context["ti"].xcom_push(
-            key="refresh_end_time", value=end_time)
-        context["ti"].xcom_push(
-            key="refresh_error", value=error)
+        context["ti"].xcom_push(key="refresh_id", value=request_id)
+        context["ti"].xcom_push(key="refresh_status", value=status)
+        context["ti"].xcom_push(key="refresh_end_time", value=end_time)
+        context["ti"].xcom_push(key="refresh_error", value=error)
